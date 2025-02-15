@@ -2,57 +2,57 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://example.com/en/</loc>
+    <loc>https://localhost:1313/en/</loc>
     <lastmod>2025-02-16T02:50:41+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://example.com/"
+                href="https://localhost:1313/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://example.com/en/"
+                href="https://localhost:1313/en/"
                 />
   </url><url>
-    <loc>https://example.com/en/p/en_attempt/</loc>
+    <loc>https://localhost:1313/en/p/en_attempt/</loc>
     <lastmod>2025-02-16T02:50:41+08:00</lastmod>
   </url><url>
-    <loc>https://example.com/en/post/</loc>
+    <loc>https://localhost:1313/en/post/</loc>
     <lastmod>2025-02-16T02:50:41+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://example.com/post/"
+                href="https://localhost:1313/post/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://example.com/en/post/"
+                href="https://localhost:1313/en/post/"
                 />
   </url><url>
-    <loc>https://example.com/en/categories/</loc>
+    <loc>https://localhost:1313/en/categories/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://example.com/categories/"
+                href="https://localhost:1313/categories/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://example.com/en/categories/"
+                href="https://localhost:1313/en/categories/"
                 />
   </url><url>
-    <loc>https://example.com/en/tags/</loc>
+    <loc>https://localhost:1313/en/tags/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://example.com/tags/"
+                href="https://localhost:1313/tags/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://example.com/en/tags/"
+                href="https://localhost:1313/en/tags/"
                 />
   </url>
 </urlset>
