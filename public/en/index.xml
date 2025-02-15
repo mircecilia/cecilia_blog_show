@@ -2,17 +2,17 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Cecilia</title>
-        <link>https://mircecilia.netlify.app/en/</link>
+        <link>https://example.com/en/</link>
         <description>Recent content on Cecilia</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en</language>
         <copyright>Cecilia</copyright>
-        <lastBuildDate>Sun, 16 Feb 2025 02:50:41 +0800</lastBuildDate><atom:link href="https://mircecilia.netlify.app/en/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sun, 16 Feb 2025 02:50:41 +0800</lastBuildDate><atom:link href="https://example.com/en/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>En_attempt</title>
-        <link>https://mircecilia.netlify.app/en/p/en_attempt/</link>
+        <link>https://example.com/en/p/en_attempt/</link>
         <pubDate>Sun, 16 Feb 2025 02:50:41 +0800</pubDate>
         
-        <guid>https://mircecilia.netlify.app/en/p/en_attempt/</guid>
+        <guid>https://example.com/en/p/en_attempt/</guid>
         <description>&lt;h2 id=&#34;追加调试页面&#34;&gt;追加调试页面
 &lt;/h2&gt;&lt;p&gt;托管至对应域名时不显示热重载页面，在此紧急追加一个调试&lt;/p&gt;
 </description>
