@@ -14,16 +14,16 @@ hasCJKLanguage: false
 
 languages:
     en:
-        languageName: English
+        languageName: 杂事记录
         title: Cecilia
-        weight: 2
+        weight: 5
         params:
             sidebar:
-                subtitle: You and I, are the future!
+                subtitle: 我们没办法对抗昨天，就算我们始终还是留恋
     zh-cn:
-        languageName: 简体中文
+        languageName: 技术复盘
         title: Cecilia
-        weight: 2
+        weight: 5
         params:
             sidebar:
                 subtitle: 人生南北多歧路
@@ -194,6 +194,12 @@ params:
         # Available values: auto, light, dark
         default: auto
 
+links:
+  - title: GitHub
+    description: GitHub is the world's largest software development platform.
+    website: https://github.com
+    image: https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png
+
     imageProcessing:
         cover:
             enabled: true
@@ -209,15 +215,9 @@ menu:
     social:
         - identifier: github
           name: GitHub
-          url: https://github.com/CaiJimmy/hugo-theme-stack
+          url: https://github.com/mircecilia/cecilia_blog_show
           params:
               icon: brand-github
-
-        - identifier: twitter
-          name: Twitter
-          url: https://twitter.com
-          params:
-              icon: brand-twitter
 
 related:
     includeNewer: true
