@@ -2,77 +2,77 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://localhost:1313/</loc>
+    <loc>https://mircecilia.netlify.app/</loc>
     <lastmod>2025-02-16T02:37:27+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://localhost:1313/en/"
+                href="https://mircecilia.netlify.app/en/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://localhost:1313/"
+                href="https://mircecilia.netlify.app/"
                 />
   </url><url>
-    <loc>https://localhost:1313/post/</loc>
+    <loc>https://mircecilia.netlify.app/post/</loc>
     <lastmod>2025-02-16T02:37:27+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://localhost:1313/en/post/"
+                href="https://mircecilia.netlify.app/en/post/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://localhost:1313/post/"
+                href="https://mircecilia.netlify.app/post/"
                 />
   </url><url>
-    <loc>https://localhost:1313/p/third_attempt/</loc>
+    <loc>https://mircecilia.netlify.app/p/third_attempt/</loc>
     <lastmod>2025-02-16T02:37:27+08:00</lastmod>
   </url><url>
-    <loc>https://localhost:1313/p/second_attempt/</loc>
+    <loc>https://mircecilia.netlify.app/p/second_attempt/</loc>
     <lastmod>2025-02-14T23:57:12+08:00</lastmod>
   </url><url>
-    <loc>https://localhost:1313/p/first_attempt/</loc>
+    <loc>https://mircecilia.netlify.app/p/first_attempt/</loc>
     <lastmod>2025-02-14T01:05:24+08:00</lastmod>
   </url><url>
-    <loc>https://localhost:1313/page/</loc>
+    <loc>https://mircecilia.netlify.app/page/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://localhost:1313/archives/</loc>
+    <loc>https://mircecilia.netlify.app/archives/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://localhost:1313/categories/</loc>
+    <loc>https://mircecilia.netlify.app/categories/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://localhost:1313/en/categories/"
+                href="https://mircecilia.netlify.app/en/categories/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://localhost:1313/categories/"
+                href="https://mircecilia.netlify.app/categories/"
                 />
   </url><url>
-    <loc>https://localhost:1313/tags/</loc>
+    <loc>https://mircecilia.netlify.app/tags/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://localhost:1313/en/tags/"
+                href="https://mircecilia.netlify.app/en/tags/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://localhost:1313/tags/"
+                href="https://mircecilia.netlify.app/tags/"
                 />
   </url><url>
-    <loc>https://localhost:1313/categories/test/</loc>
+    <loc>https://mircecilia.netlify.app/categories/test/</loc>
   </url><url>
-    <loc>https://localhost:1313/%E5%85%B3%E4%BA%8E/</loc>
+    <loc>https://mircecilia.netlify.app/%E5%85%B3%E4%BA%8E/</loc>
   </url><url>
-    <loc>https://localhost:1313/search/</loc>
+    <loc>https://mircecilia.netlify.app/search/</loc>
   </url><url>
-    <loc>https://localhost:1313/%E5%8F%8B%E9%93%BE/</loc>
+    <loc>https://mircecilia.netlify.app/%E5%8F%8B%E9%93%BE/</loc>
   </url>
 </urlset>

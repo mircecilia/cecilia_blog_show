@@ -2,57 +2,57 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://localhost:1313/en/</loc>
+    <loc>https://mircecilia.netlify.app/en/</loc>
     <lastmod>2025-02-16T02:50:41+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://localhost:1313/"
+                href="https://mircecilia.netlify.app/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://localhost:1313/en/"
+                href="https://mircecilia.netlify.app/en/"
                 />
   </url><url>
-    <loc>https://localhost:1313/en/p/en_attempt/</loc>
+    <loc>https://mircecilia.netlify.app/en/p/en_attempt/</loc>
     <lastmod>2025-02-16T02:50:41+08:00</lastmod>
   </url><url>
-    <loc>https://localhost:1313/en/post/</loc>
+    <loc>https://mircecilia.netlify.app/en/post/</loc>
     <lastmod>2025-02-16T02:50:41+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://localhost:1313/post/"
+                href="https://mircecilia.netlify.app/post/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://localhost:1313/en/post/"
+                href="https://mircecilia.netlify.app/en/post/"
                 />
   </url><url>
-    <loc>https://localhost:1313/en/categories/</loc>
+    <loc>https://mircecilia.netlify.app/en/categories/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://localhost:1313/categories/"
+                href="https://mircecilia.netlify.app/categories/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://localhost:1313/en/categories/"
+                href="https://mircecilia.netlify.app/en/categories/"
                 />
   </url><url>
-    <loc>https://localhost:1313/en/tags/</loc>
+    <loc>https://mircecilia.netlify.app/en/tags/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://localhost:1313/tags/"
+                href="https://mircecilia.netlify.app/tags/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://localhost:1313/en/tags/"
+                href="https://mircecilia.netlify.app/en/tags/"
                 />
   </url>
 </urlset>
