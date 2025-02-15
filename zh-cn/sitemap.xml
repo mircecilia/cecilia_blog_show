@@ -2,77 +2,77 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://example.com/</loc>
+    <loc>https://mircecilia.netlify.app/</loc>
     <lastmod>2025-02-16T02:37:27+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://example.com/en/"
+                href="https://mircecilia.netlify.app/en/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://example.com/"
+                href="https://mircecilia.netlify.app/"
                 />
   </url><url>
-    <loc>https://example.com/post/</loc>
+    <loc>https://mircecilia.netlify.app/post/</loc>
     <lastmod>2025-02-16T02:37:27+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://example.com/en/post/"
+                href="https://mircecilia.netlify.app/en/post/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://example.com/post/"
+                href="https://mircecilia.netlify.app/post/"
                 />
   </url><url>
-    <loc>https://example.com/p/third_attempt/</loc>
+    <loc>https://mircecilia.netlify.app/p/third_attempt/</loc>
     <lastmod>2025-02-16T02:37:27+08:00</lastmod>
   </url><url>
-    <loc>https://example.com/p/second_attempt/</loc>
+    <loc>https://mircecilia.netlify.app/p/second_attempt/</loc>
     <lastmod>2025-02-14T23:57:12+08:00</lastmod>
   </url><url>
-    <loc>https://example.com/p/first_attempt/</loc>
+    <loc>https://mircecilia.netlify.app/p/first_attempt/</loc>
     <lastmod>2025-02-14T01:05:24+08:00</lastmod>
   </url><url>
-    <loc>https://example.com/page/</loc>
+    <loc>https://mircecilia.netlify.app/page/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://example.com/archives/</loc>
+    <loc>https://mircecilia.netlify.app/archives/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>https://example.com/categories/</loc>
+    <loc>https://mircecilia.netlify.app/categories/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://example.com/en/categories/"
+                href="https://mircecilia.netlify.app/en/categories/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://example.com/categories/"
+                href="https://mircecilia.netlify.app/categories/"
                 />
   </url><url>
-    <loc>https://example.com/tags/</loc>
+    <loc>https://mircecilia.netlify.app/tags/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="https://example.com/en/tags/"
+                href="https://mircecilia.netlify.app/en/tags/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="https://example.com/tags/"
+                href="https://mircecilia.netlify.app/tags/"
                 />
   </url><url>
-    <loc>https://example.com/categories/test/</loc>
+    <loc>https://mircecilia.netlify.app/categories/test/</loc>
   </url><url>
-    <loc>https://example.com/%E5%85%B3%E4%BA%8E/</loc>
+    <loc>https://mircecilia.netlify.app/%E5%85%B3%E4%BA%8E/</loc>
   </url><url>
-    <loc>https://example.com/search/</loc>
+    <loc>https://mircecilia.netlify.app/search/</loc>
   </url><url>
-    <loc>https://example.com/%E5%8F%8B%E9%93%BE/</loc>
+    <loc>https://mircecilia.netlify.app/%E5%8F%8B%E9%93%BE/</loc>
   </url>
 </urlset>
