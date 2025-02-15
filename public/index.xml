@@ -5,18 +5,16 @@
         <link>https://example.com/</link>
         <description>Recent content on Cecilia</description>
         <generator>Hugo -- gohugo.io</generator>
-        <language>zh-cn</language>
+        <language>en</language>
         <copyright>Cecilia</copyright>
-        <lastBuildDate>Sun, 16 Feb 2025 02:37:27 +0800</lastBuildDate><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Third_attempt</title>
-        <link>https://example.com/p/third_attempt/</link>
-        <pubDate>Sun, 16 Feb 2025 02:37:27 +0800</pubDate>
+        <lastBuildDate>Sun, 16 Feb 2025 02:50:41 +0800</lastBuildDate><atom:link href="https://example.com/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>En_attempt</title>
+        <link>https://example.com/p/en_attempt/</link>
+        <pubDate>Sun, 16 Feb 2025 02:50:41 +0800</pubDate>
         
-        <guid>https://example.com/p/third_attempt/</guid>
-        <description>&lt;h2 id=&#34;修改&#34;&gt;修改
-&lt;/h2&gt;&lt;p&gt;将友链修改完成，并将整个博客内容分为技术复盘与杂事记录两部分，技术复盘作为默认页面进行发布，
-杂事使用原英文界面进行保存，方法为post时使用index.en.md发布，本次仍发现content/categories
-未进行修改完善，该页面不出现在主页而是archive，后期择机修改，以及关于页面过空，内容待填充&lt;/p&gt;
+        <guid>https://example.com/p/en_attempt/</guid>
+        <description>&lt;h2 id=&#34;追加调试页面&#34;&gt;追加调试页面
+&lt;/h2&gt;&lt;p&gt;托管至对应域名时不显示热重载页面，在此紧急追加一个调试&lt;/p&gt;
 </description>
         </item>
         <item>
@@ -51,21 +49,32 @@
         <description></description>
         </item>
         <item>
-        <title>关于</title>
-        <link>https://example.com/%E5%85%B3%E4%BA%8E/</link>
-        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        <title>About</title>
+        <link>https://example.com/about/</link>
+        <pubDate>Thu, 28 Feb 2019 00:00:00 +0000</pubDate>
         
-        <guid>https://example.com/%E5%85%B3%E4%BA%8E/</guid>
-        <description>&lt;p&gt;一个人，要走多远的距离，才能在时间的尽头，追回最初的自己&lt;/p&gt;
+        <guid>https://example.com/about/</guid>
+        <description>&lt;p&gt;Written in Go, Hugo is an open source static site generator available under the &lt;a class=&#34;link&#34; href=&#34;https://github.com/gohugoio/hugo/blob/master/LICENSE&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Apache License 2.0.&lt;/a&gt; Hugo supports TOML, YAML and JSON data file types, Markdown and HTML content files and uses shortcodes to add rich content. Other notable features are taxonomies, multilingual mode, image processing, custom output formats, HTML/CSS/JS minification and support for Sass SCSS workflows.&lt;/p&gt;
+&lt;p&gt;Hugo makes use of a variety of open source projects including:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/yuin/goldmark&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/yuin/goldmark&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/alecthomas/chroma&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/alecthomas/chroma&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/muesli/smartcrop&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/muesli/smartcrop&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/spf13/cobra&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/spf13/cobra&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/spf13/viper&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/spf13/viper&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Hugo is ideal for blogs, corporate websites, creative portfolios, online magazines, single page applications or even a website with thousands of pages.&lt;/p&gt;
+&lt;p&gt;Hugo is for people who want to hand code their own website without worrying about setting up complicated runtimes, dependencies and databases.&lt;/p&gt;
+&lt;p&gt;Websites built with Hugo are extremely fast, secure and can be deployed anywhere including, AWS, GitHub Pages, Heroku, Netlify and any other hosting provider.&lt;/p&gt;
+&lt;p&gt;Learn more and contribute on &lt;a class=&#34;link&#34; href=&#34;https://github.com/gohugoio&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;GitHub&lt;/a&gt;.&lt;/p&gt;
 </description>
-        </item>
-        <item>
-        <title>搜索</title>
-        <link>https://example.com/search/</link>
-        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-        
-        <guid>https://example.com/search/</guid>
-        <description></description>
         </item>
         <item>
         <title>友链</title>
@@ -73,6 +82,14 @@
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
         <guid>https://example.com/%E5%8F%8B%E9%93%BE/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>搜索</title>
+        <link>https://example.com/search/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://example.com/search/</guid>
         <description></description>
         </item>
         

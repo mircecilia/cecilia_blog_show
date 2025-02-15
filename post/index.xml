@@ -5,18 +5,16 @@
         <link>https://example.com/post/</link>
         <description>Recent content in Posts on Cecilia</description>
         <generator>Hugo -- gohugo.io</generator>
-        <language>zh-cn</language>
+        <language>en</language>
         <copyright>Cecilia</copyright>
-        <lastBuildDate>Sun, 16 Feb 2025 02:37:27 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Third_attempt</title>
-        <link>https://example.com/p/third_attempt/</link>
-        <pubDate>Sun, 16 Feb 2025 02:37:27 +0800</pubDate>
+        <lastBuildDate>Sun, 16 Feb 2025 02:50:41 +0800</lastBuildDate><atom:link href="https://example.com/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>En_attempt</title>
+        <link>https://example.com/p/en_attempt/</link>
+        <pubDate>Sun, 16 Feb 2025 02:50:41 +0800</pubDate>
         
-        <guid>https://example.com/p/third_attempt/</guid>
-        <description>&lt;h2 id=&#34;修改&#34;&gt;修改
-&lt;/h2&gt;&lt;p&gt;将友链修改完成，并将整个博客内容分为技术复盘与杂事记录两部分，技术复盘作为默认页面进行发布，
-杂事使用原英文界面进行保存，方法为post时使用index.en.md发布，本次仍发现content/categories
-未进行修改完善，该页面不出现在主页而是archive，后期择机修改，以及关于页面过空，内容待填充&lt;/p&gt;
+        <guid>https://example.com/p/en_attempt/</guid>
+        <description>&lt;h2 id=&#34;追加调试页面&#34;&gt;追加调试页面
+&lt;/h2&gt;&lt;p&gt;托管至对应域名时不显示热重载页面，在此紧急追加一个调试&lt;/p&gt;
 </description>
         </item>
         <item>
