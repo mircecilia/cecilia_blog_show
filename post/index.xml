@@ -7,7 +7,17 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>Cecilia</copyright>
-        <lastBuildDate>Sun, 16 Feb 2025 02:37:27 +0800</lastBuildDate><atom:link href="https://mircecilia.netlify.app/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 18 Feb 2025 23:40:46 +0800</lastBuildDate><atom:link href="https://mircecilia.netlify.app/post/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Error_test</title>
+        <link>https://mircecilia.netlify.app/p/error_test/</link>
+        <pubDate>Tue, 18 Feb 2025 23:40:46 +0800</pubDate>
+        
+        <guid>https://mircecilia.netlify.app/p/error_test/</guid>
+        <description>&lt;h2 id=&#34;莫名其妙的神秘bug&#34;&gt;莫名其妙的神秘bug
+&lt;/h2&gt;&lt;p&gt;未知问题，动都没动开始报错，追加post进行调试&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>Third_attempt</title>
         <link>https://mircecilia.netlify.app/p/third_attempt/</link>
         <pubDate>Sun, 16 Feb 2025 02:37:27 +0800</pubDate>
