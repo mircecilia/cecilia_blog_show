@@ -16,14 +16,14 @@ languages:
     en:
         languageName: 杂事记录
         title: Cecilia
-        weight: 5
+        weight: 3
         params:
             sidebar:
                 subtitle: 我们没办法对抗昨天，就算我们始终还是留恋
     zh-cn:
         languageName: 技术复盘
         title: Cecilia
-        weight: 5
+        weight: 3
         params:
             sidebar:
                 subtitle: 人生南北多歧路
@@ -37,7 +37,7 @@ services:
         id:
 
 pagination:
-    pagerSize: 3
+    pagerSize: 5
 
 permalinks:
     post: /p/:slug/
