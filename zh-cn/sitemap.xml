@@ -15,6 +15,22 @@
                 href="https://mircecilia.netlify.app/"
                 />
   </url><url>
+    <loc>https://mircecilia.netlify.app/categories/</loc>
+    <lastmod>2025-02-25T14:05:50+08:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://mircecilia.netlify.app/en/categories/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="zh-cn"
+                href="https://mircecilia.netlify.app/categories/"
+                />
+  </url><url>
+    <loc>https://mircecilia.netlify.app/categories/dsaa/</loc>
+    <lastmod>2025-02-25T14:05:50+08:00</lastmod>
+  </url><url>
     <loc>https://mircecilia.netlify.app/post/</loc>
     <lastmod>2025-02-25T14:05:50+08:00</lastmod>
     <xhtml:link
@@ -28,38 +44,17 @@
                 href="https://mircecilia.netlify.app/post/"
                 />
   </url><url>
-    <loc>https://mircecilia.netlify.app/p/%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%9D%E6%AD%A5/</loc>
+    <loc>https://mircecilia.netlify.app/categories/tree/</loc>
     <lastmod>2025-02-25T14:05:50+08:00</lastmod>
   </url><url>
-    <loc>https://mircecilia.netlify.app/p/error_test/</loc>
-    <lastmod>2025-02-18T23:40:46+08:00</lastmod>
-  </url><url>
-    <loc>https://mircecilia.netlify.app/p/third_attempt/</loc>
-    <lastmod>2025-02-16T02:37:27+08:00</lastmod>
-  </url><url>
-    <loc>https://mircecilia.netlify.app/p/second_attempt/</loc>
-    <lastmod>2025-02-14T23:57:12+08:00</lastmod>
-  </url><url>
-    <loc>https://mircecilia.netlify.app/p/first_attempt/</loc>
-    <lastmod>2025-02-14T01:05:24+08:00</lastmod>
+    <loc>https://mircecilia.netlify.app/p/%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%9D%E6%AD%A5/</loc>
+    <lastmod>2025-02-25T14:05:50+08:00</lastmod>
   </url><url>
     <loc>https://mircecilia.netlify.app/page/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://mircecilia.netlify.app/archives/</loc>
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>https://mircecilia.netlify.app/categories/</loc>
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://mircecilia.netlify.app/en/categories/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="zh-cn"
-                href="https://mircecilia.netlify.app/categories/"
-                />
   </url><url>
     <loc>https://mircecilia.netlify.app/tags/</loc>
     <xhtml:link

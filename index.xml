@@ -215,51 +215,6 @@
 </description>
         </item>
         <item>
-        <title>Error_test</title>
-        <link>https://mircecilia.netlify.app/p/error_test/</link>
-        <pubDate>Tue, 18 Feb 2025 23:40:46 +0800</pubDate>
-        
-        <guid>https://mircecilia.netlify.app/p/error_test/</guid>
-        <description>&lt;h2 id=&#34;莫名其妙的神秘bug&#34;&gt;莫名其妙的神秘bug
-&lt;/h2&gt;&lt;p&gt;未知问题，动都没动开始报错，追加post进行调试&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>Third_attempt</title>
-        <link>https://mircecilia.netlify.app/p/third_attempt/</link>
-        <pubDate>Sun, 16 Feb 2025 02:37:27 +0800</pubDate>
-        
-        <guid>https://mircecilia.netlify.app/p/third_attempt/</guid>
-        <description>&lt;h2 id=&#34;修改&#34;&gt;修改
-&lt;/h2&gt;&lt;p&gt;将友链修改完成，并将整个博客内容分为技术复盘与杂事记录两部分，技术复盘作为默认页面进行发布，
-杂事使用原英文界面进行保存，方法为post时使用index.en.md发布，本次仍发现content/categories
-未进行修改完善，该页面不出现在主页而是archive，后期择机修改，以及关于页面过空，内容待填充&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>Second_attempt</title>
-        <link>https://mircecilia.netlify.app/p/second_attempt/</link>
-        <pubDate>Fri, 14 Feb 2025 23:57:12 +0800</pubDate>
-        
-        <guid>https://mircecilia.netlify.app/p/second_attempt/</guid>
-        <description>&lt;h2 id=&#34;尝试&#34;&gt;尝试
-&lt;/h2&gt;&lt;p&gt;自动化部署完成，尝试一次new git，确定deploy出现未知的语法错误是否有影响
-补充：热重载正常，但无法进行自动部署，再次尝试git(有效)
-部署至网页需要一定时间，自动化部署完毕&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>First_attempt</title>
-        <link>https://mircecilia.netlify.app/p/first_attempt/</link>
-        <pubDate>Fri, 14 Feb 2025 01:05:24 +0800</pubDate>
-        
-        <guid>https://mircecilia.netlify.app/p/first_attempt/</guid>
-        <description>&lt;h2 id=&#34;第一个博客搭建&#34;&gt;第一个博客搭建
-&lt;/h2&gt;&lt;p&gt;太麻烦了这玩意，搭了半天终于搭起来了，就是不知道markdown语法又出什么问题了，在vsc里预览没问题，
-投到网站预览里全是乱的，明天再解决，今天先研究自动化部署&lt;/p&gt;
-</description>
-        </item>
-        <item>
         <title>归档</title>
         <link>https://mircecilia.netlify.app/archives/</link>
         <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>

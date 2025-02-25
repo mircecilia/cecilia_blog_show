@@ -1,7 +1,11 @@
 ---
 date : '2025-02-25T14:05:50+08:00'
+description : 
 draft : flase
 title : '二叉树初步'
+categories : 
+        - tree
+        - DSAA
 ---
 
 ## 树的定义
