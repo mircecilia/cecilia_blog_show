@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://mircecilia.netlify.app/en/</loc>
-    <lastmod>2025-02-16T02:50:41+08:00</lastmod>
+    <lastmod>2025-03-03T23:14:55+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -15,11 +15,8 @@
                 href="https://mircecilia.netlify.app/en/"
                 />
   </url><url>
-    <loc>https://mircecilia.netlify.app/en/p/en_attempt/</loc>
-    <lastmod>2025-02-16T02:50:41+08:00</lastmod>
-  </url><url>
     <loc>https://mircecilia.netlify.app/en/post/</loc>
-    <lastmod>2025-02-16T02:50:41+08:00</lastmod>
+    <lastmod>2025-03-03T23:14:55+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -30,6 +27,12 @@
                 hreflang="en"
                 href="https://mircecilia.netlify.app/en/post/"
                 />
+  </url><url>
+    <loc>https://mircecilia.netlify.app/en/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%A4%8D%E7%9B%98/</loc>
+    <lastmod>2025-03-03T23:14:55+08:00</lastmod>
+  </url><url>
+    <loc>https://mircecilia.netlify.app/en/p/en_attempt/</loc>
+    <lastmod>2025-02-16T02:50:41+08:00</lastmod>
   </url><url>
     <loc>https://mircecilia.netlify.app/en/categories/</loc>
     <xhtml:link

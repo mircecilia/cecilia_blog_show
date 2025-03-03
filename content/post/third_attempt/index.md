@@ -1,7 +1,7 @@
 ---
-date : '2025-02-16T02:37:27+08:00'
-draft : true
-title : 'Third_attempt'
+date: 2025-02-16T02:37:27+08:00
+draft: true
+title: Third_attempt
 ---
 
 ## 修改

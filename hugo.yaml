@@ -19,7 +19,7 @@ languages:
         weight: 3
         params:
             sidebar:
-                subtitle: 我们没办法对抗昨天，就算我们始终还是留恋
+                subtitle: 戏谑是我无情的悲悯
     zh-cn:
         languageName: 技术复盘
         title: Cecilia
