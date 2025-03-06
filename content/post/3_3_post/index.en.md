@@ -1,7 +1,7 @@
 ---
 date : '2025-03-03T23:14:55+08:00'
 draft : flase
-title : '数据结构复盘'
+title : '三月三日'
 ---
 
 bst , avl , qsort , msort 代码实现完毕，明天进行笔记复盘，kmp 的 next 数组仍需学习  

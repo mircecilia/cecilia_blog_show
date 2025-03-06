@@ -8,25 +8,14 @@
         <language>en</language>
         <copyright>Cecilia</copyright>
         <lastBuildDate>Mon, 03 Mar 2025 23:14:55 +0800</lastBuildDate><atom:link href="https://mircecilia.netlify.app/en/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>数据结构复盘</title>
-        <link>https://mircecilia.netlify.app/en/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%A4%8D%E7%9B%98/</link>
+        <title>三月三日</title>
+        <link>https://mircecilia.netlify.app/en/p/%E4%B8%89%E6%9C%88%E4%B8%89%E6%97%A5/</link>
         <pubDate>Mon, 03 Mar 2025 23:14:55 +0800</pubDate>
         
-        <guid>https://mircecilia.netlify.app/en/p/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%A4%8D%E7%9B%98/</guid>
+        <guid>https://mircecilia.netlify.app/en/p/%E4%B8%89%E6%9C%88%E4%B8%89%E6%97%A5/</guid>
         <description>&lt;p&gt;bst , avl , qsort , msort 代码实现完毕，明天进行笔记复盘，kmp 的 next 数组仍需学习&lt;br&gt;
 要抽空看看课内了，感觉快收作业了&lt;br&gt;
 粤高速五日线转弯立马清仓，等五日线企稳再做，应尝试年化利率做法，这市场太残酷了&lt;/p&gt;
-</description>
-        </item>
-        <item>
-        <title>En_attempt</title>
-        <link>https://mircecilia.netlify.app/en/p/en_attempt/</link>
-        <pubDate>Sun, 16 Feb 2025 02:50:41 +0800</pubDate>
-        
-        <guid>https://mircecilia.netlify.app/en/p/en_attempt/</guid>
-        <description>&lt;h2 id=&#34;追加调试页面&#34;&gt;追加调试页面
-&lt;/h2&gt;&lt;p&gt;托管至对应域名时不显示热重载页面，在此紧急追加一个调试
-在修改baseurl后页面恢复正常&lt;/p&gt;
 </description>
         </item>
         

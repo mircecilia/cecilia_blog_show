@@ -6,6 +6,7 @@ title: 二叉树初步
 categories:
   - tree
   - DSAA
+  - python
 ---
 
 ## 树的定义
