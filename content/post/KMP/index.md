@@ -45,7 +45,10 @@ e.g:
 void computenextval (const char* pattern, int m, int* next, int* nextval){
     nextval[0] = 0;
     for(int i = 0;i < n;i++){
-        if(pattern[i] == pattern[next[i] - 1]){
+        if(pattern[i] == pattern[next[i] - 1]){ 
+            // next[i] 为 j 指针跳过前 n 位重复的字母后的指向
+            // 而此时需要检测的就是被跳过的最后一位字母是否重复（即指针跳转后的前一位）
+            // 因此需要减去一
             nextval[i] = nextval[next[i] - 1];
         }
         else if(pattern[i] != pattern[next[i] - 1]){
@@ -81,6 +84,7 @@ void kmp (const char* text, const char* pattern){
         else if(i < n && text[i] != pattern[j]){
             if(j != 0){
                 j = nextval[j - 1];
+                // 此处 j - 1 也是先后退 j 指针至还有重复前后缀的最后一位再查 next 数组
             }
             else{
                 i++;
