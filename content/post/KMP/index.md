@@ -42,7 +42,7 @@ e.g:
 ## next 数组优化
 
 ``` c
-void computenextval(const char* pattern, int m, int* next, int* nextval){
+void computenextval (const char* pattern, int m, int* next, int* nextval){
     nextval[0] = 0;
     for(int i = 0;i < n;i++){
         if(pattern[i] == pattern[next[i] - 1]){
@@ -76,11 +76,11 @@ void kmp (const char* text, const char* pattern){
         }
         else if(j == n){
             printf("have found! the location is %d",i-j);
-            j = next[j - 1];
+            j = nextval[j - 1];
         }
         else if(i < n && text[i] != pattern[j]){
             if(j != 0){
-                j = next[j - 1];
+                j = nextval[j - 1];
             }
             else{
                 i++;
