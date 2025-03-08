@@ -11,22 +11,22 @@ categories:
 ## next数组的计算
 
 ``` c
-void computenext (const char* pattern, int m, int *next){
+void computenext (const char* pattern, int m, int* next){
     int len = 0;
     next [0] = 0;
     int i = 1;
-    while(i<m){
-        if(pattern[i]==pattern[len]){
+    while(i < m){
+        if(pattern[i] == pattern[len]){
             len++;
-            next[i]=len;
+            next[i] = len;
             i++;
         }
         else{
-            if(len!=0){
+            if(len != 0){
                 len = next[len-1];
             }
             else{
-                next[i]=0;
+                next[i] = 0;
                 i++;
             }
         }
@@ -39,6 +39,24 @@ next 数组的计算本质是查询给定文本的前后缀是否相同，next �
 e.g:  
 若给定文本是 "abdcabp abdcabe"，此时 i 指向 e，检测得到 p 不等于 e，那么只有可能是 "...ab(e)" 与前面形成了更短的相同前缀，此时由于在第一次检测 "abdcabd" 中已经检测过 "ab" 这个字符串的 next 数组，所以只需查找 "abdcab" 中第二次 "ab" 的 next 数组即可得到下一次需要检测的字符串，在本例中就是检测加入 i 所指字母后是否构成 "abd"
 
+## next 数组优化
+
+``` c
+void computenextval(const char* pattern, int m, int* next, int* nextval){
+    nextval[0] = 0;
+    for(int i = 0;i < n;i++){
+        if(pattern[i] == pattern[next[i] - 1]){
+            nextval[i] = nextval[next[i] - 1];
+        }
+        else if(pattern[i] != pattern[next[i] - 1]){
+            nextval[i] = next[i];
+        }
+    }
+}
+```
+
+nextval 数组本质是对 KMP 算法的提前优化，若 j 指针回退后指向的字母与回退前指向字母相同，则该次回退本无需进行，而 nextval 数组优化了此问题，使得 j 指针无需进行不必要的回退，小幅度优化了长文本串中 KMP 算法的时间复杂度
+
 ## KMP算法
 
 ``` c
@@ -48,19 +66,21 @@ void kmp (const char* text, const char* pattern){
     int n = strlen(pattern);
     int m = strlen(text);
     int next[n];
+    int nextval[n];
     computenext(pattern,n,next);
+    computenextval(pattern,n,next,nextval);
     while(i < m){
-        if(text[i]==pattern[j]){
+        if(text[i] == pattern[j]){
             i++;
             j++;
         }
         else if(j == n){
             printf("have found! the location is %d",i-j);
-            j = next[j-1];
+            j = next[j - 1];
         }
-        else if(i < n && text[i]!=pattern[j]){
+        else if(i < n && text[i] != pattern[j]){
             if(j != 0){
-                j = next[j-1];
+                j = next[j - 1];
             }
             else{
                 i++;
@@ -76,4 +96,4 @@ e.g：
 
 ## 总结
 
-KMP算法大幅度优化了BF算法的按位暴力回溯求解，通过保持指针 i 不动，使得时间复杂度由 O(m*n) 变为 O(m+n)，规避了坏情况对算法稳定度带来的影响
+KMP算法大幅度优化了BF算法使用的按位暴力回溯求解，通过保持指针 i 不动，不断回退移动 j 指针，使得时间复杂度由 O(m*n) 变为 O(m+n)，规避了坏情况对算法稳定度带来的影响

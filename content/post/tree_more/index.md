@@ -36,7 +36,7 @@ node* creatNode(int value){
 
 ``` c
 node* insert(node* root, int value){
-    if(root==NULL){
+    if(root == NULL){
         return creatNode(value);
     }
     if(value<root->value){
@@ -53,7 +53,7 @@ node* insert(node* root, int value){
 
 ```c
 node* search(node* root,int value){
-    if(root->value==value || root==NULL){
+    if(root->value == value || root == NULL){
         return root;
     }
     if(value<root->value){
@@ -88,8 +88,8 @@ node* delete(node* root, int value){
     else if(value > root->value){
         root->right=delete(root->right,value);
     }  // 前半部分寻找结点
-    else if(value == root->value){ //找到结点后
-        if(root->left == NULL){ //若删除的结点没有或只有一个结点
+    else if(value == root->value){ // 找到结点后
+        if(root->left == NULL){ // 若删除的结点没有或只有一个结点
             node* temp = root->right;
             free(root);
             return temp;
@@ -100,7 +100,7 @@ node* delete(node* root, int value){
             return temp;
         }
         // 若结点有两个结点，则找到其右树的最小结点将其代替
-        node* temp=findmin(root->right);
+        node* temp = findmin(root->right);
         root->value = temp->value;
         root->right = delete(root->right,temp->value);
     }
@@ -158,7 +158,7 @@ node* creatnode(int data){
     node* root = (node*)malloc(sizeof(node));
     root->data = data;
     root->left = NULL;
-    root->right =NULL;
+    root->right = NULL;
     root->height = 1;
     return root; 
 }
@@ -210,7 +210,7 @@ node* insert(node* root, int data){
         return root; // 插入相同结点则返回原有结点
     }
     // 找到插入位置
-    root->height = max(getheight(root->left),getheight(root->right))+1; //实时更新树的高度
+    root->height = max(getheight(root->left),getheight(root->right))+1; // 实时更新树的高度
 
     int balance = getbalance(root); // 计算目前的平衡因子
     // 四种情况分类
@@ -286,7 +286,7 @@ node* delete(node* root , int data){
         root->left = leftrotate(root->left);
         return rightrotate(root);
     }
-    if(balance < -1 && getbalance(root->right) <=0){
+    if(balance < -1 && getbalance(root->right) <= 0){
         return leftrotate(root);
     }
     if(balance < -1 && getbalance(root->right) > 0){
@@ -301,4 +301,4 @@ node* delete(node* root , int data){
 
 AVL的构建要求高于BST，更加严格  
 因此AVL可以防止插入数据顺序过于整齐而导致整个树退化为链表，从而使时间复杂度由 log(n) 提升至 n  
-AVL的插入，查找，删除时间复杂度均为 log(n)，但若进行频繁的插入，删除，红黑树的性能会优于AVL
+AVL的插入，查找，删除时间复杂度均为 log(n)，但若进行频繁的插入，删除，红黑树的性能会优于AVL,因此 AVL 主要用于查找
