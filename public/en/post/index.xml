@@ -14,7 +14,7 @@
         
         <guid>https://mircecilia.netlify.app/en/p/en_attempt/</guid>
         <description>&lt;h2 id=&#34;追加调试页面&#34;&gt;追加调试页面
-&lt;/h2&gt;&lt;p&gt;托管至对应域名时不显示热重载页面，在此紧急追加一个调试
+&lt;/h2&gt;&lt;p&gt;托管至对应域名时不显示热重载页面，在此紧急追加一个调试&lt;br&gt;
 在修改baseurl后页面恢复正常&lt;/p&gt;
 </description>
         </item>
