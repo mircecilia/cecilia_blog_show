@@ -14,14 +14,14 @@ hasCJKLanguage: false
 
 languages:
     en:
-        languageName: 杂事记录
+        languageName: 科研小记
         title: Cecilia
         weight: 3
         params:
             sidebar:
-                subtitle: 戏谑是我无情的悲悯
+                subtitle: 喧闹散去时，愿你不再孤独
     zh-cn:
-        languageName: 技术复盘
+        languageName: 算法杂笔
         title: Cecilia
         weight: 3
         params:

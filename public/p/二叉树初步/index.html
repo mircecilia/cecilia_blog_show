@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="树的定义 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 def tree(label,branches=[]): for branch in branches: assert is tree(branch),&#39;branches must be branch` return [label]+list(branches) def label(tree): return tree[0] def branches(tree): return tree[1:] def is tree(tree): if type(tree)!=list or len(tree)&lt;1: return False for branch in branches(tree): if not is tree(branch): return False return True def is_leaf(tree): return not branches(tree) #test=tree(3,[tree(7),tree(9,[tree(6),tree(0)])]) #print(test) 此处对树，枝干以及树叶进行定义并检测\n斐波那契树 1 2 3 4 5 6 7 8 def fib_tree(n): if n&lt;=1: return tree(1) else: left,right=fib_tree(n-1),fib_tree(n-2) return tree(label(left)+label(right),[left,right]) #test=fib_tree(5) #print(test) 此处可以通过递归自顶向下生成一颗斐波那契树\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="树的定义 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 def tree(label,branches=[]): for branch in branches: assert is_tree(branch),&#39;branches must be branch` return [label]+list(branches) def label(tree): return tree[0] def branches(tree): return tree[1:] def is tree(tree): if type(tree)!=list or len(tree)&lt;1: return False for branch in branches(tree): if not is_tree(branch): return False return True def is_leaf(tree): return not branches(tree) #test=tree(3,[tree(7),tree(9,[tree(6),tree(0)])]) #print(test) 此处对树，枝干以及树叶进行定义并检测\n斐波那契树 1 2 3 4 5 6 7 8 def fib_tree(n): if n&lt;=1: return tree(1) else: left,right=fib_tree(n-1),fib_tree(n-2) return tree(label(left)+label(right),[left,right]) #test=fib_tree(5) #print(test) 此处可以通过递归自顶向下生成一颗斐波那契树\n">
 <title>二叉树初步</title>
 
 <link rel='canonical' href='https://mircecilia.netlify.app/p/%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%9D%E6%AD%A5/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="二叉树初步">
-<meta property='og:description' content="树的定义 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 def tree(label,branches=[]): for branch in branches: assert is tree(branch),&#39;branches must be branch` return [label]+list(branches) def label(tree): return tree[0] def branches(tree): return tree[1:] def is tree(tree): if type(tree)!=list or len(tree)&lt;1: return False for branch in branches(tree): if not is tree(branch): return False return True def is_leaf(tree): return not branches(tree) #test=tree(3,[tree(7),tree(9,[tree(6),tree(0)])]) #print(test) 此处对树，枝干以及树叶进行定义并检测\n斐波那契树 1 2 3 4 5 6 7 8 def fib_tree(n): if n&lt;=1: return tree(1) else: left,right=fib_tree(n-1),fib_tree(n-2) return tree(label(left)+label(right),[left,right]) #test=fib_tree(5) #print(test) 此处可以通过递归自顶向下生成一颗斐波那契树\n">
+<meta property='og:description' content="树的定义 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 def tree(label,branches=[]): for branch in branches: assert is_tree(branch),&#39;branches must be branch` return [label]+list(branches) def label(tree): return tree[0] def branches(tree): return tree[1:] def is tree(tree): if type(tree)!=list or len(tree)&lt;1: return False for branch in branches(tree): if not is_tree(branch): return False return True def is_leaf(tree): return not branches(tree) #test=tree(3,[tree(7),tree(9,[tree(6),tree(0)])]) #print(test) 此处对树，枝干以及树叶进行定义并检测\n斐波那契树 1 2 3 4 5 6 7 8 def fib_tree(n): if n&lt;=1: return tree(1) else: left,right=fib_tree(n-1),fib_tree(n-2) return tree(label(left)+label(right),[left,right]) #test=fib_tree(5) #print(test) 此处可以通过递归自顶向下生成一颗斐波那契树\n">
 <meta property='og:url' content='https://mircecilia.netlify.app/p/%E4%BA%8C%E5%8F%89%E6%A0%91%E5%88%9D%E6%AD%A5/'>
 <meta property='og:site_name' content='Cecilia'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-02-25T14:05:50&#43;08:00'/><meta property='article:modified_time' content='2025-02-25T14:05:50&#43;08:00'/>
 <meta name="twitter:title" content="二叉树初步">
-<meta name="twitter:description" content="树的定义 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 def tree(label,branches=[]): for branch in branches: assert is tree(branch),&#39;branches must be branch` return [label]+list(branches) def label(tree): return tree[0] def branches(tree): return tree[1:] def is tree(tree): if type(tree)!=list or len(tree)&lt;1: return False for branch in branches(tree): if not is tree(branch): return False return True def is_leaf(tree): return not branches(tree) #test=tree(3,[tree(7),tree(9,[tree(6),tree(0)])]) #print(test) 此处对树，枝干以及树叶进行定义并检测\n斐波那契树 1 2 3 4 5 6 7 8 def fib_tree(n): if n&lt;=1: return tree(1) else: left,right=fib_tree(n-1),fib_tree(n-2) return tree(label(left)+label(right),[left,right]) #test=fib_tree(5) #print(test) 此处可以通过递归自顶向下生成一颗斐波那契树\n">
+<meta name="twitter:description" content="树的定义 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 def tree(label,branches=[]): for branch in branches: assert is_tree(branch),&#39;branches must be branch` return [label]+list(branches) def label(tree): return tree[0] def branches(tree): return tree[1:] def is tree(tree): if type(tree)!=list or len(tree)&lt;1: return False for branch in branches(tree): if not is_tree(branch): return False return True def is_leaf(tree): return not branches(tree) #test=tree(3,[tree(7),tree(9,[tree(6),tree(0)])]) #print(test) 此处对树，枝干以及树叶进行定义并检测\n斐波那契树 1 2 3 4 5 6 7 8 def fib_tree(n): if n&lt;=1: return tree(1) else: left,right=fib_tree(n-1),fib_tree(n-2) return tree(label(left)+label(right),[left,right]) #test=fib_tree(5) #print(test) 此处可以通过递归自顶向下生成一颗斐波那契树\n">
     </head>
     <body class="
     article-page
@@ -211,9 +211,9 @@
 
                             <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
                                 
-                                    <option value="https://mircecilia.netlify.app/" selected>技术复盘</option>
+                                    <option value="https://mircecilia.netlify.app/en/" >科研小记</option>
                                 
-                                    <option value="https://mircecilia.netlify.app/en/" >杂事记录</option>
+                                    <option value="https://mircecilia.netlify.app/" selected>算法杂笔</option>
                                 
                             </select>
                         </li>
@@ -374,7 +374,7 @@
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">tree</span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="n">branches</span><span class="o">=</span><span class="p">[]):</span>  
 </span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">:</span>
-</span></span><span class="line"><span class="cl">        <span class="k">assert</span> <span class="ow">is</span> <span class="n">tree</span><span class="p">(</span><span class="n">branch</span><span class="p">),</span><span class="s1">&#39;branches must be branch`</span>
+</span></span><span class="line"><span class="cl">        <span class="k">assert</span> <span class="n">is_tree</span><span class="p">(</span><span class="n">branch</span><span class="p">),</span><span class="s1">&#39;branches must be branch`</span>
 </span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">branches</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">tree</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -384,7 +384,7 @@
 </span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span><span class="o">!=</span><span class="nb">list</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">:</span>
 </span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">False</span>
 </span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">branch</span> <span class="ow">in</span> <span class="n">branches</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
-</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="ow">not</span> <span class="ow">is</span> <span class="n">tree</span><span class="p">(</span><span class="n">branch</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_tree</span><span class="p">(</span><span class="n">branch</span><span class="p">):</span>
 </span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="kc">False</span>
 </span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="kc">True</span>
 </span></span><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">is_leaf</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>

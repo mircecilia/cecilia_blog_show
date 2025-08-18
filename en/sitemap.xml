@@ -2,8 +2,24 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>https://mircecilia.netlify.app/en/p/attention-is-all-you-need/</loc>
+    <lastmod>2025-08-18T00:58:25+08:00</lastmod>
+  </url><url>
+    <loc>https://mircecilia.netlify.app/en/categories/</loc>
+    <lastmod>2025-08-18T00:58:25+08:00</lastmod>
+    <xhtml:link
+                rel="alternate"
+                hreflang="zh-cn"
+                href="https://mircecilia.netlify.app/categories/"
+                />
+    <xhtml:link
+                rel="alternate"
+                hreflang="en"
+                href="https://mircecilia.netlify.app/en/categories/"
+                />
+  </url><url>
     <loc>https://mircecilia.netlify.app/en/</loc>
-    <lastmod>2025-03-03T23:14:55+08:00</lastmod>
+    <lastmod>2025-08-18T00:58:25+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -16,7 +32,7 @@
                 />
   </url><url>
     <loc>https://mircecilia.netlify.app/en/post/</loc>
-    <lastmod>2025-03-03T23:14:55+08:00</lastmod>
+    <lastmod>2025-08-18T00:58:25+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -28,20 +44,8 @@
                 href="https://mircecilia.netlify.app/en/post/"
                 />
   </url><url>
-    <loc>https://mircecilia.netlify.app/en/p/en_attempt/</loc>
-    <lastmod>2025-02-16T02:50:41+08:00</lastmod>
-  </url><url>
-    <loc>https://mircecilia.netlify.app/en/categories/</loc>
-    <xhtml:link
-                rel="alternate"
-                hreflang="zh-cn"
-                href="https://mircecilia.netlify.app/categories/"
-                />
-    <xhtml:link
-                rel="alternate"
-                hreflang="en"
-                href="https://mircecilia.netlify.app/en/categories/"
-                />
+    <loc>https://mircecilia.netlify.app/en/categories/transformer/</loc>
+    <lastmod>2025-08-18T00:58:25+08:00</lastmod>
   </url><url>
     <loc>https://mircecilia.netlify.app/en/tags/</loc>
     <xhtml:link

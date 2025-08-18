@@ -14,7 +14,7 @@ categories:
 ``` python
 def tree(label,branches=[]):  
     for branch in branches:
-        assert is tree(branch),'branches must be branch`
+        assert is_tree(branch),'branches must be branch`
         return [label]+list(branches)
 def label(tree):
     return tree[0]
@@ -24,7 +24,7 @@ def is tree(tree):
     if type(tree)!=list or len(tree)<1:
         return False
         for branch in branches(tree):
-            if not is tree(branch):
+            if not is_tree(branch):
                 return False
         return True
 def is_leaf(tree):
