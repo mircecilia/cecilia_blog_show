@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Embedding matrix 对于 llm 来说，人类的所有语言必须被转换为数字才能被接受，而这一转化过程所需的数据是由不同的训练任务训练后得到的，transformer 所要求的张量不仅需要表达这个词的语意，同时要求包含这个词的位置信息\n而这两个需求在最初设想时是被分开的，即：先通过特定任务训练 token 对应的张量表达相关语意，再训练张量用于描述位置信息，二者相加从而得到 transformer 最初所需的张量，但这种做法会破坏远程衰减性，损伤原句最初表达的意思，因此，现多使用 RoPE (Rotary Positional Embeddings) 对 Q、K 张量进行旋转，从而将位置信息融入查询矩阵，键矩阵中\nQuery , Key and value 在获得 token 对应的张量后，transformer 将使用训练得到的权重矩阵 $Wq , Wk , Wv$ 与其相乘，最终得到 Q , K , V 三组张量， 再进行 $ Softmax(\\frac{Q*K^T}{\\sqrt{d_k}})V $ ，同时掩蔽一些注意力，从而使后面的 token 无法影响前面 token 的输出，得到的结果即不同 tokens 之间的加权相关性，将其与每个最初始的张量相加，第一次的注意力更新就完成了\nMultilayer perceptron 在 transformers 层更新后，新的张量将进入 MLP 层进行处理，通过 linear 进行线性变换，再通过 RELU 等函数进行剪裁，处理后的向量再通过线性变换恢复为原来的维度，其中所有参与线性变换的矩阵参数皆通过梯度下降及反向传播进行学习\nBackpropagation 反向传播的灵感来源于链式求导法则中大量重复的计算结果，在此我们使用识别手写数字这一只包含线性神经元的项目进行举例：\n对于任意一级的神经元，其都由权重矩阵、bias、激活函数 (Softmax) 以及概率输出构成，则对于任意可调参数，都可从后向前由链式求导法则计算其导数，在固定学习率后，对每个参数都减去学习率乘以导数，即可使结果的损失函数最小化，这也就是通过数据集训练模型的方法\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Embedding matrix 对于 llm 来说，人类的所有语言必须被转换为数字才能被接受，而这一转化过程所需的数据是由不同的训练任务训练后得到的，transformer 所要求的张量不仅需要表达这个词的语意，同时要求包含这个词的位置信息\n而这两个需求在最初设想时是被分开的，即：先通过特定任务训练 token 对应的张量表达相关语意，再训练张量用于描述位置信息，二者相加从而得到 transformer 最初所需的张量，但这种做法会破坏远程衰减性，损伤原句最初表达的意思，因此，现多使用 RoPE (Rotary Positional Embeddings) 对 Q、K 张量进行旋转，从而将位置信息融入查询矩阵，键矩阵中\nQuery , Key and value 在获得 token 对应的张量后，transformer 将使用训练得到的权重矩阵 $Wq , Wk , Wv$ 与其相乘，最终得到 Q , K , V 三组张量， 再进行 $ Softmax(\\frac{Q*K^T}{\\sqrt{d_k}})V $ ，同时掩蔽一些注意力，从而使后面的 token 无法影响前面 token 的输出，得到的结果即不同 tokens 之间的加权相关性，将其与每个最初始的张量相加，第一次的注意力更新就完成了\n在这里需要注意，对于多头注意力，是将每个 token 对应的张量进行切分，在子空间中学习对应的权重矩阵\nMultilayer perceptron 在 transformers 层更新后，新的张量将进入 MLP 层进行处理，通过 linear 进行线性变换，再通过 RELU 等函数进行剪裁，处理后的向量再通过线性变换恢复为原来的维度，其中所有参与线性变换的矩阵参数皆通过梯度下降及反向传播进行学习\nBackpropagation 反向传播的灵感来源于链式求导法则中大量重复的计算结果，在此我们使用识别手写数字这一只包含线性神经元的项目进行举例：\n对于任意一级的神经元，其都由权重矩阵、bias、激活函数 (Softmax) 以及概率输出构成，则对于任意可调参数，都可从后向前由链式求导法则计算其导数，在固定学习率后，对每个参数都减去学习率乘以导数，即可使结果的损失函数最小化，在训练集的辅助下调整各参数\n">
 <title>Attention is all you need</title>
 
 <link rel='canonical' href='https://mircecilia.netlify.app/en/p/attention-is-all-you-need/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Attention is all you need">
-<meta property='og:description' content="Embedding matrix 对于 llm 来说，人类的所有语言必须被转换为数字才能被接受，而这一转化过程所需的数据是由不同的训练任务训练后得到的，transformer 所要求的张量不仅需要表达这个词的语意，同时要求包含这个词的位置信息\n而这两个需求在最初设想时是被分开的，即：先通过特定任务训练 token 对应的张量表达相关语意，再训练张量用于描述位置信息，二者相加从而得到 transformer 最初所需的张量，但这种做法会破坏远程衰减性，损伤原句最初表达的意思，因此，现多使用 RoPE (Rotary Positional Embeddings) 对 Q、K 张量进行旋转，从而将位置信息融入查询矩阵，键矩阵中\nQuery , Key and value 在获得 token 对应的张量后，transformer 将使用训练得到的权重矩阵 $Wq , Wk , Wv$ 与其相乘，最终得到 Q , K , V 三组张量， 再进行 $ Softmax(\\frac{Q*K^T}{\\sqrt{d_k}})V $ ，同时掩蔽一些注意力，从而使后面的 token 无法影响前面 token 的输出，得到的结果即不同 tokens 之间的加权相关性，将其与每个最初始的张量相加，第一次的注意力更新就完成了\nMultilayer perceptron 在 transformers 层更新后，新的张量将进入 MLP 层进行处理，通过 linear 进行线性变换，再通过 RELU 等函数进行剪裁，处理后的向量再通过线性变换恢复为原来的维度，其中所有参与线性变换的矩阵参数皆通过梯度下降及反向传播进行学习\nBackpropagation 反向传播的灵感来源于链式求导法则中大量重复的计算结果，在此我们使用识别手写数字这一只包含线性神经元的项目进行举例：\n对于任意一级的神经元，其都由权重矩阵、bias、激活函数 (Softmax) 以及概率输出构成，则对于任意可调参数，都可从后向前由链式求导法则计算其导数，在固定学习率后，对每个参数都减去学习率乘以导数，即可使结果的损失函数最小化，这也就是通过数据集训练模型的方法\n">
+<meta property='og:description' content="Embedding matrix 对于 llm 来说，人类的所有语言必须被转换为数字才能被接受，而这一转化过程所需的数据是由不同的训练任务训练后得到的，transformer 所要求的张量不仅需要表达这个词的语意，同时要求包含这个词的位置信息\n而这两个需求在最初设想时是被分开的，即：先通过特定任务训练 token 对应的张量表达相关语意，再训练张量用于描述位置信息，二者相加从而得到 transformer 最初所需的张量，但这种做法会破坏远程衰减性，损伤原句最初表达的意思，因此，现多使用 RoPE (Rotary Positional Embeddings) 对 Q、K 张量进行旋转，从而将位置信息融入查询矩阵，键矩阵中\nQuery , Key and value 在获得 token 对应的张量后，transformer 将使用训练得到的权重矩阵 $Wq , Wk , Wv$ 与其相乘，最终得到 Q , K , V 三组张量， 再进行 $ Softmax(\\frac{Q*K^T}{\\sqrt{d_k}})V $ ，同时掩蔽一些注意力，从而使后面的 token 无法影响前面 token 的输出，得到的结果即不同 tokens 之间的加权相关性，将其与每个最初始的张量相加，第一次的注意力更新就完成了\n在这里需要注意，对于多头注意力，是将每个 token 对应的张量进行切分，在子空间中学习对应的权重矩阵\nMultilayer perceptron 在 transformers 层更新后，新的张量将进入 MLP 层进行处理，通过 linear 进行线性变换，再通过 RELU 等函数进行剪裁，处理后的向量再通过线性变换恢复为原来的维度，其中所有参与线性变换的矩阵参数皆通过梯度下降及反向传播进行学习\nBackpropagation 反向传播的灵感来源于链式求导法则中大量重复的计算结果，在此我们使用识别手写数字这一只包含线性神经元的项目进行举例：\n对于任意一级的神经元，其都由权重矩阵、bias、激活函数 (Softmax) 以及概率输出构成，则对于任意可调参数，都可从后向前由链式求导法则计算其导数，在固定学习率后，对每个参数都减去学习率乘以导数，即可使结果的损失函数最小化，在训练集的辅助下调整各参数\n">
 <meta property='og:url' content='https://mircecilia.netlify.app/en/p/attention-is-all-you-need/'>
 <meta property='og:site_name' content='Cecilia'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-08-18T00:58:25&#43;08:00'/><meta property='article:modified_time' content='2025-08-18T00:58:25&#43;08:00'/>
 <meta name="twitter:title" content="Attention is all you need">
-<meta name="twitter:description" content="Embedding matrix 对于 llm 来说，人类的所有语言必须被转换为数字才能被接受，而这一转化过程所需的数据是由不同的训练任务训练后得到的，transformer 所要求的张量不仅需要表达这个词的语意，同时要求包含这个词的位置信息\n而这两个需求在最初设想时是被分开的，即：先通过特定任务训练 token 对应的张量表达相关语意，再训练张量用于描述位置信息，二者相加从而得到 transformer 最初所需的张量，但这种做法会破坏远程衰减性，损伤原句最初表达的意思，因此，现多使用 RoPE (Rotary Positional Embeddings) 对 Q、K 张量进行旋转，从而将位置信息融入查询矩阵，键矩阵中\nQuery , Key and value 在获得 token 对应的张量后，transformer 将使用训练得到的权重矩阵 $Wq , Wk , Wv$ 与其相乘，最终得到 Q , K , V 三组张量， 再进行 $ Softmax(\\frac{Q*K^T}{\\sqrt{d_k}})V $ ，同时掩蔽一些注意力，从而使后面的 token 无法影响前面 token 的输出，得到的结果即不同 tokens 之间的加权相关性，将其与每个最初始的张量相加，第一次的注意力更新就完成了\nMultilayer perceptron 在 transformers 层更新后，新的张量将进入 MLP 层进行处理，通过 linear 进行线性变换，再通过 RELU 等函数进行剪裁，处理后的向量再通过线性变换恢复为原来的维度，其中所有参与线性变换的矩阵参数皆通过梯度下降及反向传播进行学习\nBackpropagation 反向传播的灵感来源于链式求导法则中大量重复的计算结果，在此我们使用识别手写数字这一只包含线性神经元的项目进行举例：\n对于任意一级的神经元，其都由权重矩阵、bias、激活函数 (Softmax) 以及概率输出构成，则对于任意可调参数，都可从后向前由链式求导法则计算其导数，在固定学习率后，对每个参数都减去学习率乘以导数，即可使结果的损失函数最小化，这也就是通过数据集训练模型的方法\n">
+<meta name="twitter:description" content="Embedding matrix 对于 llm 来说，人类的所有语言必须被转换为数字才能被接受，而这一转化过程所需的数据是由不同的训练任务训练后得到的，transformer 所要求的张量不仅需要表达这个词的语意，同时要求包含这个词的位置信息\n而这两个需求在最初设想时是被分开的，即：先通过特定任务训练 token 对应的张量表达相关语意，再训练张量用于描述位置信息，二者相加从而得到 transformer 最初所需的张量，但这种做法会破坏远程衰减性，损伤原句最初表达的意思，因此，现多使用 RoPE (Rotary Positional Embeddings) 对 Q、K 张量进行旋转，从而将位置信息融入查询矩阵，键矩阵中\nQuery , Key and value 在获得 token 对应的张量后，transformer 将使用训练得到的权重矩阵 $Wq , Wk , Wv$ 与其相乘，最终得到 Q , K , V 三组张量， 再进行 $ Softmax(\\frac{Q*K^T}{\\sqrt{d_k}})V $ ，同时掩蔽一些注意力，从而使后面的 token 无法影响前面 token 的输出，得到的结果即不同 tokens 之间的加权相关性，将其与每个最初始的张量相加，第一次的注意力更新就完成了\n在这里需要注意，对于多头注意力，是将每个 token 对应的张量进行切分，在子空间中学习对应的权重矩阵\nMultilayer perceptron 在 transformers 层更新后，新的张量将进入 MLP 层进行处理，通过 linear 进行线性变换，再通过 RELU 等函数进行剪裁，处理后的向量再通过线性变换恢复为原来的维度，其中所有参与线性变换的矩阵参数皆通过梯度下降及反向传播进行学习\nBackpropagation 反向传播的灵感来源于链式求导法则中大量重复的计算结果，在此我们使用识别手写数字这一只包含线性神经元的项目进行举例：\n对于任意一级的神经元，其都由权重矩阵、bias、激活函数 (Softmax) 以及概率输出构成，则对于任意可调参数，都可从后向前由链式求导法则计算其导数，在固定学习率后，对每个参数都减去学习率乘以导数，即可使结果的损失函数最小化，在训练集的辅助下调整各参数\n">
     </head>
     <body class="
     article-page
@@ -56,7 +56,7 @@
                     
                     
                         
-                        <img src="/img/avatar_hu_786877cd44004c54.png" width="300"
+                        <img src="/img/avatar_hu_9932ff953b61ae7c.png" width="300"
                             height="300" class="site-logo" loading="lazy" alt="Avatar">
                     
                 
@@ -114,9 +114,9 @@
 
                             <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
                                 
-                                    <option value="https://mircecilia.netlify.app/en/" selected>科研小记</option>
-                                
                                     <option value="https://mircecilia.netlify.app/" >算法杂笔</option>
+                                
+                                    <option value="https://mircecilia.netlify.app/en/" selected>科研小记</option>
                                 
                             </select>
                         </li>
@@ -245,11 +245,12 @@
 <p>而这两个需求在最初设想时是被分开的，即：先通过特定任务训练 token 对应的张量表达相关语意，再训练张量用于描述位置信息，二者相加从而得到 transformer 最初所需的张量，但这种做法会破坏远程衰减性，损伤原句最初表达的意思，因此，现多使用 RoPE (Rotary Positional Embeddings) 对 Q、K 张量进行旋转，从而将位置信息融入查询矩阵，键矩阵中</p>
 <h2 id="query--key-and-value">Query , Key and value
 </h2><p>在获得 token 对应的张量后，transformer 将使用训练得到的权重矩阵 $Wq , Wk , Wv$ 与其相乘，最终得到 Q , K , V 三组张量， 再进行 $ Softmax(\frac{Q*K^T}{\sqrt{d_k}})V $ ，同时掩蔽一些注意力，从而使后面的 token 无法影响前面 token 的输出，得到的结果即不同 tokens 之间的加权相关性，将其与每个最初始的张量相加，第一次的注意力更新就完成了</p>
+<p>在这里需要注意，对于多头注意力，是将每个 token 对应的张量进行切分，在子空间中学习对应的权重矩阵</p>
 <h2 id="multilayer-perceptron">Multilayer perceptron
 </h2><p>在 transformers 层更新后，新的张量将进入 MLP 层进行处理，通过 linear 进行线性变换，再通过 RELU 等函数进行剪裁，处理后的向量再通过线性变换恢复为原来的维度，其中所有参与线性变换的矩阵参数皆通过梯度下降及反向传播进行学习</p>
 <h2 id="backpropagation">Backpropagation
 </h2><p>反向传播的灵感来源于链式求导法则中大量重复的计算结果，在此我们使用识别手写数字这一只包含线性神经元的项目进行举例：</p>
-<p>对于任意一级的神经元，其都由权重矩阵、bias、激活函数 (Softmax) 以及概率输出构成，则对于任意可调参数，都可从后向前由链式求导法则计算其导数，在固定学习率后，对每个参数都减去学习率乘以导数，即可使结果的损失函数最小化，这也就是通过数据集训练模型的方法</p>
+<p>对于任意一级的神经元，其都由权重矩阵、bias、激活函数 (Softmax) 以及概率输出构成，则对于任意可调参数，都可从后向前由链式求导法则计算其导数，在固定学习率后，对每个参数都减去学习率乘以导数，即可使结果的损失函数最小化，在训练集的辅助下调整各参数</p>
 
 </section>
 
