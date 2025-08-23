@@ -7,7 +7,23 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>en</language>
         <copyright>Cecilia</copyright>
-        <lastBuildDate>Mon, 18 Aug 2025 00:58:25 +0800</lastBuildDate><atom:link href="https://mircecilia.netlify.app/en/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Fri, 22 Aug 2025 12:19:40 +0800</lastBuildDate><atom:link href="https://mircecilia.netlify.app/en/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Dllm</title>
+        <link>https://mircecilia.netlify.app/en/categories/dllm/</link>
+        <pubDate>Fri, 22 Aug 2025 12:19:40 +0800</pubDate>
+        
+        <guid>https://mircecilia.netlify.app/en/categories/dllm/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Pytorch</title>
+        <link>https://mircecilia.netlify.app/en/categories/pytorch/</link>
+        <pubDate>Fri, 22 Aug 2025 12:19:40 +0800</pubDate>
+        
+        <guid>https://mircecilia.netlify.app/en/categories/pytorch/</guid>
+        <description></description>
+        </item>
+        <item>
         <title>Transformer</title>
         <link>https://mircecilia.netlify.app/en/categories/transformer/</link>
         <pubDate>Mon, 18 Aug 2025 00:58:25 +0800</pubDate>

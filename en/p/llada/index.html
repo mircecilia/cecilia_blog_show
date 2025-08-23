@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="基于高斯分布的噪声添加 1 2 3 4 5 6 7 def add_gumbel_noise(logits, temperature): if temperature == 0: return logits logits = logits.to(torch.float64) noise = torch.rand_like(logits, dtype=torch.float64) gumbel_noise = (- torch.log(noise)) ** temperature return logits.exp() / gumbel_noise 此函数强制转化 logits 数据类型为 float64 ，并将基于高斯分布的噪声转化为与 logits 相同的形状，最终将 logits 转化为概率形式，通过除以 gumbei_noise 加入噪声\n计算每步解码的 token 数量 1 2 3 4 5 6 7 8 9 10 11 12 def get_num_transfer_tokens(mask_index, steps): mask_num = mask_index.sum(dim=1, keepdim=True) base = mask_num // steps remainder = mask_num % steps num_transfer_tokens = torch.zeros(mask_num.size(0), steps, device=mask_index.device, dtype=torch.int64) + base for i in range(mask_num.size(0)): num_transfer_tokens[i, :remainder[i]] += 1 return num_transfer_tokens 此函数接收 mask_token 的布尔序列以及解码步数，使用 sum 函数获取掩码 token 数量，再计算每步的基础解码数与无法均摊的余数，最终返回每步需要解码的 token 数\n">
+<title>LLaDA</title>
+
+<link rel='canonical' href='https://mircecilia.netlify.app/en/p/llada/'>
+
+<link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="LLaDA">
+<meta property='og:description' content="基于高斯分布的噪声添加 1 2 3 4 5 6 7 def add_gumbel_noise(logits, temperature): if temperature == 0: return logits logits = logits.to(torch.float64) noise = torch.rand_like(logits, dtype=torch.float64) gumbel_noise = (- torch.log(noise)) ** temperature return logits.exp() / gumbel_noise 此函数强制转化 logits 数据类型为 float64 ，并将基于高斯分布的噪声转化为与 logits 相同的形状，最终将 logits 转化为概率形式，通过除以 gumbei_noise 加入噪声\n计算每步解码的 token 数量 1 2 3 4 5 6 7 8 9 10 11 12 def get_num_transfer_tokens(mask_index, steps): mask_num = mask_index.sum(dim=1, keepdim=True) base = mask_num // steps remainder = mask_num % steps num_transfer_tokens = torch.zeros(mask_num.size(0), steps, device=mask_index.device, dtype=torch.int64) + base for i in range(mask_num.size(0)): num_transfer_tokens[i, :remainder[i]] += 1 return num_transfer_tokens 此函数接收 mask_token 的布尔序列以及解码步数，使用 sum 函数获取掩码 token 数量，再计算每步的基础解码数与无法均摊的余数，最终返回每步需要解码的 token 数\n">
+<meta property='og:url' content='https://mircecilia.netlify.app/en/p/llada/'>
+<meta property='og:site_name' content='Cecilia'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-08-22T12:19:40&#43;08:00'/><meta property='article:modified_time' content='2025-08-22T12:19:40&#43;08:00'/>
+<meta name="twitter:title" content="LLaDA">
+<meta name="twitter:description" content="基于高斯分布的噪声添加 1 2 3 4 5 6 7 def add_gumbel_noise(logits, temperature): if temperature == 0: return logits logits = logits.to(torch.float64) noise = torch.rand_like(logits, dtype=torch.float64) gumbel_noise = (- torch.log(noise)) ** temperature return logits.exp() / gumbel_noise 此函数强制转化 logits 数据类型为 float64 ，并将基于高斯分布的噪声转化为与 logits 相同的形状，最终将 logits 转化为概率形式，通过除以 gumbei_noise 加入噪声\n计算每步解码的 token 数量 1 2 3 4 5 6 7 8 9 10 11 12 def get_num_transfer_tokens(mask_index, steps): mask_num = mask_index.sum(dim=1, keepdim=True) base = mask_num // steps remainder = mask_num % steps num_transfer_tokens = torch.zeros(mask_num.size(0), steps, device=mask_index.device, dtype=torch.int64) + base for i in range(mask_num.size(0)): num_transfer_tokens[i, :remainder[i]] += 1 return num_transfer_tokens 此函数接收 mask_token 的布尔序列以及解码步数，使用 sum 函数获取掩码 token 数量，再计算每步的基础解码数与无法均摊的余数，最终返回每步需要解码的 token 数\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/en/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_9932ff953b61ae7c.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🐦‍🔥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/en">Cecilia</a></h1>
+            <h2 class="site-description">喧闹散去时，愿你不再孤独</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/mircecilia/cecilia_blog_show'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+                    
+                        <li id="i18n-switch">  
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-language" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M4 5h7" />
+  <path d="M9 3v2c0 4.418 -2.239 8 -5 8" />
+  <path d="M5 9c-.003 2.144 2.952 3.908 6.7 4" />
+  <path d="M12 20l4 -9l4 9" />
+  <path d="M19.1 18h-6.2" />
+</svg>
+
+
+
+                            <select name="language" title="language" onchange="window.location.href = this.selectedOptions[0].value">
+                                
+                                    <option value="https://mircecilia.netlify.app/en/" selected>科研小记</option>
+                                
+                                    <option value="https://mircecilia.netlify.app/" >算法杂笔</option>
+                                
+                            </select>
+                        </li>
+                    
+                
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#基于高斯分布的噪声添加">基于高斯分布的噪声添加</a></li>
+    <li><a href="#计算每步解码的-token-数量">计算每步解码的 token 数量</a></li>
+    <li><a href="#初始化与块划分">初始化与块划分</a></li>
+    <li><a href="#块内解码">块内解码</a></li>
+    <li><a href="#解码方式选择">解码方式选择</a></li>
+    <li><a href="#屏蔽范围外及已解码的-token">屏蔽范围外及已解码的 token</a></li>
+    <li><a href="#更新原序列-x">更新原序列 x</a></li>
+    <li><a href="#generate-example">generate example</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/en/categories/pytorch/" >
+                Pytorch
+            </a>
+        
+            <a href="/en/categories/dllm/" >
+                Dllm
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/en/p/llada/">LLaDA</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2025-08-22</time>
+            </div>
+        
+
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="基于高斯分布的噪声添加">基于高斯分布的噪声添加
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">add_gumbel_noise</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">temperature</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">temperature</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">logits</span>
+</span></span><span class="line"><span class="cl">    <span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand_like</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">gumbel_noise</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">noise</span><span class="p">))</span> <span class="o">**</span> <span class="n">temperature</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">logits</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span> <span class="o">/</span> <span class="n">gumbel_noise</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此函数强制转化 logits 数据类型为 float64 ，并将基于高斯分布的噪声转化为与 logits 相同的形状，最终将 logits 转化为概率形式，通过除以 gumbei_noise 加入噪声</p>
+<h2 id="计算每步解码的-token-数量">计算每步解码的 token 数量
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">get_num_transfer_tokens</span><span class="p">(</span><span class="n">mask_index</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mask_num</span> <span class="o">=</span> <span class="n">mask_index</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">base</span> <span class="o">=</span> <span class="n">mask_num</span> <span class="o">//</span> <span class="n">steps</span>
+</span></span><span class="line"><span class="cl">    <span class="n">remainder</span> <span class="o">=</span> <span class="n">mask_num</span> <span class="o">%</span> <span class="n">steps</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">num_transfer_tokens</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">mask_num</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">steps</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">mask_index</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span> <span class="o">+</span> <span class="n">base</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mask_num</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">num_transfer_tokens</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span><span class="n">remainder</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">num_transfer_tokens</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此函数接收 mask_token 的布尔序列以及解码步数，使用 sum 函数获取掩码 token 数量，再计算每步的基础解码数与无法均摊的余数，最终返回每步需要解码的 token 数</p>
+<h2 id="初始化与块划分">初始化与块划分
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">gen_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">block_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">             <span class="n">cfg_scale</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">remasking</span><span class="o">=</span><span class="s1">&#39;low_confidence&#39;</span><span class="p">,</span> <span class="n">mask_id</span><span class="o">=</span><span class="mi">126336</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">prompt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">gen_length</span><span class="p">),</span> <span class="n">mask_id</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">x</span><span class="p">[:,</span> <span class="p">:</span><span class="n">prompt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">prompt</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">prompt_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">!=</span> <span class="n">mask_id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">assert</span> <span class="n">gen_length</span> <span class="o">%</span> <span class="n">block_length</span> <span class="o">==</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="n">num_blocks</span> <span class="o">=</span> <span class="n">gen_length</span> <span class="o">//</span> <span class="n">block_length</span> <span class="c1"># gen_length 为生成 token 的长度</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">assert</span> <span class="n">steps</span> <span class="o">%</span> <span class="n">num_blocks</span> <span class="o">==</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl">    <span class="n">steps</span> <span class="o">=</span> <span class="n">steps</span> <span class="o">//</span> <span class="n">num_blocks</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>本段函数先将 x 的 token 全部初始化为 mask token（此处规定为126336），然后再将 prompt 的 token 部分进行填充，之后对块进行划分，再计算每个块需要迭代多少步</p>
+<h2 id="块内解码">块内解码
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">for</span> <span class="n">num_block</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_blocks</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="n">block_mask_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[:,</span> <span class="n">prompt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">num_block</span> <span class="o">*</span> <span class="n">block_length</span><span class="p">:</span> <span class="n">prompt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">num_block</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_length</span><span class="p">:]</span> <span class="o">==</span> <span class="n">mask_id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="n">num_transfer_tokens</span> <span class="o">=</span> <span class="n">get_num_transfer_tokens</span><span class="p">(</span><span class="n">block_mask_index</span><span class="p">,</span> <span class="n">steps</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">            <span class="n">mask_index</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">mask_id</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="n">cfg_scale</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">un_x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">                <span class="n">un_x</span><span class="p">[</span><span class="n">prompt_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">mask_id</span>
+</span></span><span class="line"><span class="cl">                <span class="n">x_</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">un_x</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_</span><span class="p">)</span><span class="o">.</span><span class="n">logits</span>
+</span></span><span class="line"><span class="cl">                <span class="n">logits</span><span class="p">,</span> <span class="n">un_logits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">logits</span> <span class="o">=</span> <span class="n">un_logits</span> <span class="o">+</span> <span class="p">(</span><span class="n">cfg_scale</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">logits</span> <span class="o">-</span> <span class="n">un_logits</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">logits</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">logits</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="n">logits_with_noise</span> <span class="o">=</span> <span class="n">add_gumbel_noise</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="n">x0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">logits_with_noise</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># b, l</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>本段函数先获取块内掩码序列，然后通过调用 get_num_transfer_tokens 函数计算块内解码 token 数，对于每一步，获取 mask_index ，然后判断是否需要条件预测，在 llada 源码中并不需要，但可以进行修改，若进行条件预测，则复制一份 un_x ，并将 prompt 部分替换为 mask_token（126336），并将 x 与 un_x 进行拼接，然后计算 logits ，再将其拆分有条件预测与无条件预测的 logits 与 un_logits ,最后使用 CFG 公式进行计算，对条件结果进行强化，若不启用 CFG ，则直接计算 logits ，之后调用 add_gumbel_noise 函数对刚刚计算出的 logits 添加噪声，再取 argmax 在 vocab_size 上算出候选 token 序列 x0</p>
+<h2 id="解码方式选择">解码方式选择
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">if</span> <span class="n">remasking</span> <span class="o">==</span> <span class="s1">&#39;low_confidence&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">p</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="n">x0_p</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">torch</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># b, l</span>
+</span></span><span class="line"><span class="cl">            <span class="k">elif</span> <span class="n">remasking</span> <span class="o">==</span> <span class="s1">&#39;random&#39;</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="n">x0_p</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">((</span><span class="n">x0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">device</span><span class="o">=</span><span class="n">x0</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="k">else</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">remasking</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>若采用置信度解码方式，则通过 softmax 函数将 logits 转化为概率分布，将每个 token 的置信度写入 x0_p 中</p>
+<p>若采用随机解码，则随机生成每个 token 的置信度写入 x0_p 中</p>
+<h2 id="屏蔽范围外及已解码的-token">屏蔽范围外及已解码的 token
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">x0_p</span><span class="p">[:,</span> <span class="n">prompt</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">num_block</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">block_length</span><span class="p">:]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">x0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_index</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">confidence</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask_index</span><span class="p">,</span> <span class="n">x0_p</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>本段函数首先将超出该块位置范围的 token 置信度设为 -inf 避免被选，然后将掩码部分的 token 用置信度代替，并保持已解码 token 不变，将该序列写入 x0 ，之后将已解码部分的置信度设为 -inf 写入 confidence</p>
+<h2 id="更新原序列-x">更新原序列 x
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">transfer_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">x0</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">confidence</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_</span><span class="p">,</span> <span class="n">select_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">confidence</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="n">num_transfer_tokens</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span>
+</span></span><span class="line"><span class="cl">    <span class="n">transfer_index</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">select_index</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span><span class="p">[</span><span class="n">transfer_index</span><span class="p">]</span> <span class="o">=</span> <span class="n">x0</span><span class="p">[</span><span class="n">transfer_index</span><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>本段函数先将 transfer_index 设置为 False ，然后在每批次样本中选择置信度最高的 token ，将其位置写入 select_index 中，然后将 transfer_index 中对应位置修改为 True ，用其将解码后的 token 写入原序列，覆盖 mask_id</p>
+<h2 id="generate-example">generate example
+</h2><ul>
+<li>original:</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [-1,-1,-1,-1,-1]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [-1,-1,-1,-1,-1]
+</span></span><span class="line"><span class="cl">    ]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>add prompt:</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [3795,-1,-1,-1,-1]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [2294,-1,-1,-1,-1]
+</span></span><span class="line"><span class="cl">    ]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>calculate:</p>
+<p>step -&gt; 4 -&gt; 2</p>
+<p>gen_length -&gt; 4</p>
+<p>block_length -&gt; 2</p>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    mask_index -&gt; 
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [False,True,True,True,True]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [False,True,True,True,True]
+</span></span><span class="line"><span class="cl">    ]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>select one of the block : <strong>(the first)</strong></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    block_mask_index -&gt; 
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [False,True,True,False,False]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [False,True,True,False,False]
+</span></span><span class="line"><span class="cl">    ]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    num_transfer_tokens -&gt; 
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [1,1]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [1,1]
+</span></span><span class="line"><span class="cl">    ]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>the first step :</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    mask_index -&gt; 
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [False,True,True,False,False]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [False,True,True,False,False]
+</span></span><span class="line"><span class="cl">    ]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    logits.shape -&gt; (2 , 5 , 5000 (size of vocabulary))
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>add noise :</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    logits_with_noise.shape -&gt; (2 , 5 , 5000 (size of vocabulary))
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    x0 -&gt; 
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [1978,2458,2049,1473,2659]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [1654,2521,3364,1758,3867]
+</span></span><span class="line"><span class="cl">    ]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>remasking :</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    p -&gt; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    x0_p -&gt; 
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [0.87,0.95,0.14,0.36,0.47]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [0.45,0.26,0.41,0.36,0.57]
+</span></span><span class="line"><span class="cl">    ] -&gt; 基于 softmax 的置信度
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>random :</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    x0_p -&gt; 
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [0.87,0.95,0.14,0.36,0.47]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [0.45,0.26,0.41,0.36,0.57]
+</span></span><span class="line"><span class="cl">    ] -&gt; 随机置信度
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>update ；</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    x0_p -&gt; 
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [-inf,0.95,0.14,-inf,-inf]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [-inf,0.26,0.41,-inf,-inf]
+</span></span><span class="line"><span class="cl">    ]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    x0 -&gt; 
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [1978,0.95,0.14,1473,2659]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [1654,0.26,0.41,1758,3867]
+</span></span><span class="line"><span class="cl">    ]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    confidence -&gt; 
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [-inf,0.95,0.14,-inf,-inf]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [-inf,0.26,0.41,-inf,-inf]
+</span></span><span class="line"><span class="cl">    ]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>overwrite x</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">    transfer_index -&gt; 
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [False,False,False,False,False]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [False,False,False,False,False]
+</span></span><span class="line"><span class="cl">    ]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    select_index -&gt; tensor([1],[2])
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    transfer_index -&gt; 
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [False,True,False,False,False]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [False,False,True,False,False]
+</span></span><span class="line"><span class="cl">    ]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    x -&gt;
+</span></span><span class="line"><span class="cl">    [
+</span></span><span class="line"><span class="cl">    [3795,2458,-1,-1,-1]
+</span></span><span class="line"><span class="cl">    ,
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    [2294,-1,3364,-1,-1]
+</span></span><span class="line"><span class="cl">    ]
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 Cecilia
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
