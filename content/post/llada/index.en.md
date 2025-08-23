@@ -61,22 +61,22 @@ def generate(model, prompt, steps=128, gen_length=128, block_length=128, tempera
 
 ```python
 for num_block in range(num_blocks):
-        block_mask_index = (x[:, prompt.shape[1] + num_block * block_length: prompt.shape[1] + (num_block + 1) * block_length:] == mask_id)
-        num_transfer_tokens = get_num_transfer_tokens(block_mask_index, steps)
-        for i in range(steps):
-            mask_index = (x == mask_id)
-            if cfg_scale > 0.:
-                un_x = x.clone()
-                un_x[prompt_index] = mask_id
-                x_ = torch.cat([x, un_x], dim=0)
-                logits = model(x_).logits
-                logits, un_logits = torch.chunk(logits, 2, dim=0)
-                logits = un_logits + (cfg_scale + 1) * (logits - un_logits)
-            else:
-                logits = model(x).logits
+    block_mask_index = (x[:, prompt.shape[1] + num_block * block_length: prompt.shape[1] + (num_block + 1) * block_length:] == mask_id)
+    num_transfer_tokens = get_num_transfer_tokens(block_mask_index, steps)
+    for i in range(steps):
+        mask_index = (x == mask_id)
+        if cfg_scale > 0.:
+            un_x = x.clone()
+            un_x[prompt_index] = mask_id
+            x_ = torch.cat([x, un_x], dim=0)
+            logits = model(x_).logits
+            logits, un_logits = torch.chunk(logits, 2, dim=0)
+            logits = un_logits + (cfg_scale + 1) * (logits - un_logits)
+        else:
+            logits = model(x).logits
 
-            logits_with_noise = add_gumbel_noise(logits, temperature=temperature)
-            x0 = torch.argmax(logits_with_noise, dim=-1) # b, l
+        logits_with_noise = add_gumbel_noise(logits, temperature=temperature)
+        x0 = torch.argmax(logits_with_noise, dim=-1) # b, l
 ```
 本段函数先获取块内掩码序列，然后通过调用 get_num_transfer_tokens 函数计算块内解码 token 数，对于每一步，获取 mask_index ，然后判断是否需要条件预测，在 llada 源码中并不需要，但可以进行修改，若进行条件预测，则复制一份 un_x ，并将 prompt 部分替换为 mask_token（126336），并将 x 与 un_x 进行拼接，然后计算 logits ，再将其拆分有条件预测与无条件预测的 logits 与 un_logits ,最后使用 CFG 公式进行计算，对条件结果进行强化，若不启用 CFG ，则直接计算 logits ，之后调用 add_gumbel_noise 函数对刚刚计算出的 logits 添加噪声，再取 argmax 在 vocab_size 上算出候选 token 序列 x0
 
@@ -84,13 +84,13 @@ for num_block in range(num_blocks):
 
 ```python
 if remasking == 'low_confidence':
-                p = F.softmax(logits, dim=-1)
-                x0_p = torch.squeeze(
-                    torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
-            elif remasking == 'random':
-                x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
-            else:
-                raise NotImplementedError(remasking)
+    p = F.softmax(logits, dim=-1)
+    x0_p = torch.squeeze(
+        torch.gather(p, dim=-1, index=torch.unsqueeze(x0, -1)), -1) # b, l
+elif remasking == 'random':
+    x0_p = torch.rand((x0.shape[0], x0.shape[1]), device=x0.device)
+else:
+    raise NotImplementedError(remasking)
 ```
 若采用置信度解码方式，则通过 softmax 函数将 logits 转化为概率分布，将每个 token 的置信度写入 x0_p 中
 
@@ -138,12 +138,14 @@ x[transfer_index] = x0[transfer_index]
     ]
 ```
 - calculate:
-  
+```  
     step -> 4 -> 2
 
     gen_length -> 4
 
     block_length -> 2
+```
+
 ```
     mask_index -> 
     
@@ -154,6 +156,7 @@ x[transfer_index] = x0[transfer_index]
     [False,True,True,True,True]
     ]
 ```
+
 - select one of the block : **(the first)**
 ```  
     block_mask_index -> 
@@ -203,7 +206,7 @@ x[transfer_index] = x0[transfer_index]
 ```
 - remasking : 
 ```  
-    p -> 
+    p.shape -> (1,5,5000) -> 包含词汇表中所有词的概率
 
     x0_p -> 
     [
@@ -211,7 +214,8 @@ x[transfer_index] = x0[transfer_index]
     ,
 
     [0.45,0.26,0.41,0.36,0.57]
-    ] -> 基于 softmax 的置信度
+    ] -> 基于 softmax 的置信度 
+    -> 仅包含各位置候选 token 的概率
 ```
 - random : 
 ```
