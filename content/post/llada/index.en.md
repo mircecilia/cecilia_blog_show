@@ -119,7 +119,7 @@ x[transfer_index] = x0[transfer_index]
 
 ## generate example
 
-- original:
+- **original**:
 ```
     [
     [-1,-1,-1,-1,-1]
@@ -128,7 +128,7 @@ x[transfer_index] = x0[transfer_index]
     [-1,-1,-1,-1,-1]
     ]
 ```
-- add prompt:
+- **add prompt**:
 ```  
     [
     [3795,-1,-1,-1,-1]
@@ -137,7 +137,7 @@ x[transfer_index] = x0[transfer_index]
     [2294,-1,-1,-1,-1]
     ]
 ```
-- calculate:
+- **calculate**:
 ```  
     step -> 4 -> 2
 
@@ -157,7 +157,7 @@ x[transfer_index] = x0[transfer_index]
     ]
 ```
 
-- select one of the block : **(the first)**
+- **select one of the block : (the first)**
 ```  
     block_mask_index -> 
     
@@ -179,7 +179,7 @@ x[transfer_index] = x0[transfer_index]
     [1,1]
     ]
 ```
-- the first step : 
+- **the first step** : 
 ```
     mask_index -> 
     
@@ -192,7 +192,7 @@ x[transfer_index] = x0[transfer_index]
 
     logits.shape -> (2 , 5 , 5000 (size of vocabulary))
 ```
-- add noise : 
+- **add noise** : 
 ```
     logits_with_noise.shape -> (2 , 5 , 5000 (size of vocabulary))
 
@@ -204,7 +204,7 @@ x[transfer_index] = x0[transfer_index]
     [1654,2521,3364,1758,3867]
     ]
 ```
-- remasking : 
+- **remasking** : 
 ```  
     p.shape -> (1,5,5000) -> 包含词汇表中所有词的概率
 
@@ -217,7 +217,7 @@ x[transfer_index] = x0[transfer_index]
     ] -> 基于 softmax 的置信度 
     -> 仅包含各位置候选 token 的概率
 ```
-- random : 
+- **random** : 
 ```
     x0_p -> 
     [
@@ -227,7 +227,7 @@ x[transfer_index] = x0[transfer_index]
     [0.45,0.26,0.41,0.36,0.57]
     ] -> 随机置信度
 ```
-- update ； 
+- **update** ； 
 ```  
     x0_p -> 
     [
@@ -254,7 +254,7 @@ x[transfer_index] = x0[transfer_index]
     ]
 ```
 
-- overwrite x
+- **overwrite x**
 ```
     transfer_index -> 
     [

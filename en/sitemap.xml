@@ -3,7 +3,7 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://mircecilia.netlify.app/en/categories/</loc>
-    <lastmod>2025-08-22T12:19:40+08:00</lastmod>
+    <lastmod>2025-08-29T11:18:33+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -16,7 +16,7 @@
                 />
   </url><url>
     <loc>https://mircecilia.netlify.app/en/</loc>
-    <lastmod>2025-08-22T12:19:40+08:00</lastmod>
+    <lastmod>2025-08-29T11:18:33+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -29,13 +29,13 @@
                 />
   </url><url>
     <loc>https://mircecilia.netlify.app/en/categories/dllm/</loc>
-    <lastmod>2025-08-22T12:19:40+08:00</lastmod>
+    <lastmod>2025-08-29T11:18:33+08:00</lastmod>
   </url><url>
-    <loc>https://mircecilia.netlify.app/en/p/llada/</loc>
-    <lastmod>2025-08-22T12:19:40+08:00</lastmod>
+    <loc>https://mircecilia.netlify.app/en/p/dream/</loc>
+    <lastmod>2025-08-29T11:18:33+08:00</lastmod>
   </url><url>
     <loc>https://mircecilia.netlify.app/en/post/</loc>
-    <lastmod>2025-08-22T12:19:40+08:00</lastmod>
+    <lastmod>2025-08-29T11:18:33+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -48,6 +48,9 @@
                 />
   </url><url>
     <loc>https://mircecilia.netlify.app/en/categories/pytorch/</loc>
+    <lastmod>2025-08-29T11:18:33+08:00</lastmod>
+  </url><url>
+    <loc>https://mircecilia.netlify.app/en/p/llada/</loc>
     <lastmod>2025-08-22T12:19:40+08:00</lastmod>
   </url><url>
     <loc>https://mircecilia.netlify.app/en/p/attention-is-all-you-need/</loc>
