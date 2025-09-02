@@ -27,7 +27,7 @@ def top_p_logits(logits, top_p=None):
 ```
 本函数先将得到的 logits 进行递减排序并获取索引，然后计算累加和，超过 top_p 概率的 logits 将被标记为 True，同时通过将整个列表右移并在第一位填充 0 来强制保留概率最大的候选 token，创建一个全为 Flase 的 mask 列表，将上述修改后的索引映射回去，最后将 mask 列表中标记为 True 的位置的 logits 设置为极小值，使其不会被采样
 
- - **generate example**
+> **generate example**
 
 ```python
 候选 token -> [A, B, C, D]
@@ -55,7 +55,7 @@ def top_k_logits(logits, top_k=None):
 ```
 本函数先进行安全性检查，防止 top_k 的大小大于词表大小，然后将前 k 大的 logits 设置为极小值防止其被采样
 
- - **generate example**
+> **generate example**
 
 ```python
 logits -> [2.0, 1.0, 0.5, -0.5]
@@ -103,7 +103,7 @@ def sample_tokens(logits, temperature=0.0, top_p=None, top_k=None, margin_confid
 
 若使用 margin_confidence，则置信度定义为第一名概率减去第二名概率，若使用 neg_entropy，则置信度定义为负熵，即分布越尖锐置信度越高
 
- - **generate example**
+> **generate example**
 
 ```python
 采用 top_k / top_p 过滤后 :
@@ -168,7 +168,8 @@ else:
 ```
 该段将输入序列的右侧全部使用 mask_token_id 填充，同时判断是否进行注意力遮蔽，若进行注意力遮蔽，则扩展传入的 attention_mask 至 max_length ，然后生成符合 transformer 架构的四维张量，使注意力机制只在非遮蔽 token 上进行，同时生成有效 token 位置相应的索引
 
- - **generate example**
+> **generate example**
+
 ```python
 attention_mask -> [1, 1, 0, 1, 0]
 max_length -> 8
@@ -218,7 +219,7 @@ for i in range(steps):
 ```
 本段函数先生成从 1 递减至 eps 的时间序列，然后调用前向传播函数生成 logits 并整体进行右移，以便对齐预测 token 位置，计算交叉熵 loss
 
-**origin** : 先计算替换比例 p_transfer，之后在每个位置上随机获得概率，低于该概率的位置被填充为 True，之后调用 sample_tokens，在每个 True 位置上，根据所选算法生成被采样的 token，最后对 x 进行更新
+> **origin** : 先计算替换比例 p_transfer，之后在每个位置上随机获得概率，低于该概率的位置被填充为 True，之后调用 sample_tokens，在每个 True 位置上，根据所选算法生成被采样的 token，最后对 x 进行更新
 
 ```python
 num_mask_token = mask_index.sum() / mask_index.shape[0]
@@ -253,3 +254,107 @@ if number_transfer_tokens > 0:
         return x
 ```
 该段函数通过 histories 保存并查看解码过程，返回最终的生成序列
+
+## 归一化 embedding 后的向量
+
+```python
+class DreamRMSNorm(nn.Module):
+    def __init__(self, hidden_size, eps=1e-6):
+        super().__init__()
+        self.weight = nn.Parameter(torch.ones(hidden_size))
+        self.variance_epsilon = eps
+
+    def forward(self, hidden_states):
+        input_dtype = hidden_states.dtype
+        hidden_states = hidden_states.to(torch.float32)
+        variance = hidden_states.pow(2).mean(-1, keepdim=True)
+        hidden_states = hidden_states * torch.rsqrt(variance + self.variance_epsilon)
+        return self.weight * hidden_states.to(input_dtype)
+
+    def extra_repr(self):
+        return f"{tuple(self.weight.shape)}, eps={self.variance_epsilon}"
+```
+本段函数先保存输入 dtype，然后将其转化为 float32 以保证数值稳定，随后对 embedding 后的向量求均方根，保证向量不改变方向而只改变长度，不损害基本语义
+
+> **generate example**
+```python
+x -> [1.0, 2.0, 3.0, 4.0]
+forward : 
+x -> [0.1826, 0.3651, 0.5477, 0.7303]
+```
+
+## ROPE 频率表计算
+
+```python
+@torch.no_grad()
+def forward(self, x, position_ids):
+    if "dynamic" in self.rope_type:
+        self._dynamic_frequency_update(position_ids, device=x.device)
+
+    inv_freq_expanded = self.inv_freq[None, :, None].float().expand(position_ids.shape[0], -1, 1)
+    position_ids_expanded = position_ids[:, None, :].float()
+    device_type = x.device.type
+    device_type = device_type if isinstance(device_type, str) and device_type != "mps" else "cpu"
+    with torch.autocast(device_type=device_type, enabled=False):
+        freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(1, 2)
+        emb = torch.cat((freqs, freqs), dim=-1)
+        cos = emb.cos()
+        sin = emb.sin()
+
+    cos = cos * self.attention_scaling
+    sin = sin * self.attention_scaling
+
+    return cos.to(dtype=x.dtype), sin.to(dtype=x.dtype)
+```
+ROPE 所对应的函数部分先进行初始化，同时添加重置参数，动态更新两个辅助函数，在此不做摘录，此段函数是 ROPE 的频率表实现，先复制 self.inv_freq 至每份 batch，然后对 position_ids 进行扩张与转置，使其可以同 inv_freq_expanded 做矩阵乘法，二者相乘后转置，拼接，即可得到每个样本在对应的位置，维度需要旋转的角度
+
+> - 在此说明为什么要对 emb 表进行复制，拼接 ：
+> 
+>   由于 ROPE 的原理是每两个维度分为一组，因此在先前计算 freq 表时，实际上是在计算每两个维度分组后对应的角度，故得到的频率表需要复制后拼接才能对应原先的 hidden 层维度
+> - 对于一个样本的某个 token 向量，频率表计算方法如下：
+>
+>   inv_freq_expanded -> [[1.0], [0.1], [0.01]]
+> 
+>   position_ids_expanded -> [3]
+> 
+>   freqs -> [3.0, 0.3, 0.03]
+> 
+>   -> [3.0, 0.3, 0.03, 3.0, 0.3, 0.03]
+> - 那么为什么不是 [3.0, 3.0, 0.3, 0.3, 0.03, 0.03] 呢？
+> 
+>   事实上这两种写法的效果是完全等效的，但是 PyTorch 在实现矩阵旋转的时候，是通过逐元素相乘和重排的方法来实现的，这样做会更方便进行广播，这点我们在后面再进行详细解析
+
+## ROPE 
+
+```python
+def rotate_half(x):
+    x1 = x[..., : x.shape[-1] // 2]
+    x2 = x[..., x.shape[-1] // 2 :]
+    return torch.cat((-x2, x1), dim=-1)
+
+def apply_rotary_pos_emb(q, k, cos, sin, position_ids=None, unsqueeze_dim=1):
+    cos = cos.unsqueeze(unsqueeze_dim)
+    sin = sin.unsqueeze(unsqueeze_dim)
+    q_embed = (q * cos) + (rotate_half(q) * sin)
+    k_embed = (k * cos) + (rotate_half(k) * sin)
+    return q_embed, k_embed
+```
+本段函数是 ROPE 的核心实现，rotate_half 先将 embedding 后的向量 (hidden state) 拆成前后两半，对后半取反后拼接，将整个向量 (x1, x2) 视作复数 (x1 + x2 i) 进行九十度旋转
+
+apply_rotary_pos_emb 将 cos 与 sin 进行升维广播，之后调用  rotate_half将 Q、K 的各维度成对进行旋转，最终返回添加位置信息后的 Q、K 向量
+
+> **generate example**
+
+```python
+rotate_half :
+x -> [1.0, 2.0, 3.0, 4.0]
+-> [-3.0, -4.0, 1.0, 2.0]
+apply_rotary_pos_emb :
+Q -> [1.0, 2.0, 3.0, 4.0]
+cos -> [0.5, 0.5, 0.5, 0.5]
+sin -> [0.866, 0.866, 0.866, 0.866]
+rotate_half(Q) -> [-3.0, -4.0, 1.0, 2.0]
+Q * cos -> [0.5, 1.0, 1.5, 2.0]
+rotate_half(Q) * sin -> [-2.598,-3.464,0.866,1.732]
+Q_embed -> [-2.098, -2.464, 2.366, 3.732]
+```
