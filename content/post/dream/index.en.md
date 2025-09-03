@@ -28,21 +28,18 @@ def top_p_logits(logits, top_p=None):
 本函数先将得到的 logits 进行递减排序并获取索引，然后计算累加和，超过 top_p 概率的 logits 将被标记为 True，同时通过将整个列表右移并在第一位填充 0 来强制保留概率最大的候选 token，创建一个全为 Flase 的 mask 列表，将上述修改后的索引映射回去，最后将 mask 列表中标记为 True 的位置的 logits 设置为极小值，使其不会被采样
 
 > **generate example**
-
-```python
-候选 token -> [A, B, C, D]
-logits -> [2.0, 0.5, 1.0, -0.5]
-top_p -> 0.8
-sorted_logits -> [2.0, 1.0, 0.5, -0.5]
-sorted_indices -> [0, 1, 2, 3]
-softmax :
-probs -> [0.57, 0.21, 0.14, 0.08]
-累计和 -> [0.57, 0.78, 0.92, 1.00]
-sorted_indices_to_remove -> [False, False, True, True]
--> [False, False, False, True]
-mask -> [False, False, False, True]
-logits -> [2.0, 1.0, 0.5, -1e38]
-```
+> ```python
+> 候选 token -> [A, B, C, D]
+> logits -> [2.0, 0.5, 1.0, -0.5]
+> top_p -> 0.8
+> softmax :
+> probs -> [0.57, 0.21, 0.14, 0.08]
+> 累计和 -> [0.57, 0.78, 0.92, 1.00]
+> sorted_indices_to_remove -> [False, False, True, True]
+> -> [False, False, False, True]
+> mask -> [False, False, False, True]
+> logits -> [2.0, 1.0, 0.5, -1e38]
+> ```
 
 ### top_k
 
@@ -56,13 +53,12 @@ def top_k_logits(logits, top_k=None):
 本函数先进行安全性检查，防止 top_k 的大小大于词表大小，然后将前 k 大的 logits 设置为极小值防止其被采样
 
 > **generate example**
-
-```python
-logits -> [2.0, 1.0, 0.5, -0.5]
-top_k -> 2
-indices_to_remove -> [False, False, True, True]
-logits -> [2.0, 1.0, -1e38, -1e38]
-```
+> ```python
+> logits -> [2.0, 1.0, 0.5, -0.5]
+> top_k -> 2
+> indices_to_remove -> [False, False, True, True]
+> logits -> [2.0, 1.0, -1e38, -1e38]
+> ```
 
 ## 从候选 token 中采样
 
@@ -104,25 +100,23 @@ def sample_tokens(logits, temperature=0.0, top_p=None, top_k=None, margin_confid
 若使用 margin_confidence，则置信度定义为第一名概率减去第二名概率，若使用 neg_entropy，则置信度定义为负熵，即分布越尖锐置信度越高
 
 > **generate example**
-
-```python
-采用 top_k / top_p 过滤后 :
-logits -> [2.0, 1.0, 0.5]
-
-temperture -> 0 :
-softmax -> [0.62, 0.23, 0.15]
-选择 token -> A
-confidence -> 0.62 ; x0 -> 0
-
-temperture -> 2 :
-logits -> [1.0, 0.5, 0.25]
-softmax -> [0.48, 0.29,0.23] # 分布更平缓
-选择 token -> A / B / C (按照概率随机抽样)
-
-confidence :
-margin_confidence -> 0.19 ; x0 -> 0 / 1 / 2
-neg_entropy -> -1.05 ; x0 -> 1
-```
+> ```python
+> 采用 top_k / top_p 过滤后 :
+> logits -> [2.0, 1.0, 0.5]
+> 
+> temperture -> 0 :
+> softmax -> [0.62, 0.23, 0.15]
+> 选择 token -> A
+> confidence -> 0.62 ; x0 -> 0
+> temperture -> 2 :
+> 
+> logits -> [1.0, 0.5, 0.25]
+> softmax -> [0.48, 0.29,0.23] # 分布更平缓
+> 选择 token -> A / B / C (按照概率随机抽样)
+> confidence :
+> margin_confidence -> 0.19 ; x0 -> 0 / 1 / 2
+> neg_entropy -> -1.05 ; x0 -> 1
+> ```
 
 ## 离散扩散解码
 
@@ -169,24 +163,23 @@ else:
 该段将输入序列的右侧全部使用 mask_token_id 填充，同时判断是否进行注意力遮蔽，若进行注意力遮蔽，则扩展传入的 attention_mask 至 max_length ，然后生成符合 transformer 架构的四维张量，使注意力机制只在非遮蔽 token 上进行，同时生成有效 token 位置相应的索引
 
 > **generate example**
-
-```python
-attention_mask -> [1, 1, 0, 1, 0]
-max_length -> 8
-attention_mask -> [1, 1, 0, 1, 0, 1, 1, 1]
-tok_idx -> [0, 1, 1, 2, 2, 3, 4, 5]
--> [0, 1, 1, 2, 1, 3, 4, 5]
-
-attention_mask ->
-[1, 1, 0, 1, 0, 1, 1, 1],
-[1, 1, 0, 1, 0, 1, 1, 1],
-[0, 0, 0, 0, 0, 0, 0, 0],
-[1, 1, 0, 1, 0, 1, 1, 1],
-[0, 0, 0, 0, 0, 0, 0, 0],
-[1, 1, 0, 1, 0, 1, 1, 1],
-[1, 1, 0, 1, 0, 1, 1, 1],
-[1, 1, 0, 1, 0, 1, 1, 1]
-```
+> ```python
+> attention_mask -> [1, 1, 0, 1, 0]
+> max_length -> 8
+> attention_mask -> [1, 1, 0, 1, 0, 1, 1, 1]
+> tok_idx -> [0, 1, 1, 2, 2, 3, 4, 5]
+> -> [0, 1, 1, 2, 1, 3, 4, 5]
+> 
+> attention_mask ->
+> [1, 1, 0, 1, 0, 1, 1, 1],
+> [1, 1, 0, 1, 0, 1, 1, 1],
+> [0, 0, 0, 0, 0, 0, 0, 0],
+> [1, 1, 0, 1, 0, 1, 1, 1],
+> [0, 0, 0, 0, 0, 0, 0, 0],
+> [1, 1, 0, 1, 0, 1, 1, 1],
+> [1, 1, 0, 1, 0, 1, 1, 1],
+> [1, 1, 0, 1, 0, 1, 1, 1]
+> ```
 
 ```python
 timesteps = torch.linspace(1, eps, steps + 1, device=x.device)
@@ -277,11 +270,11 @@ class DreamRMSNorm(nn.Module):
 本段函数先保存输入 dtype，然后将其转化为 float32 以保证数值稳定，随后对 embedding 后的向量求均方根，保证向量不改变方向而只改变长度，不损害基本语义
 
 > **generate example**
-```python
-x -> [1.0, 2.0, 3.0, 4.0]
-forward : 
-x -> [0.1826, 0.3651, 0.5477, 0.7303]
-```
+> ```python
+> x -> [1.0, 2.0, 3.0, 4.0]
+> forward : 
+> x -> [0.1826, 0.3651, 0.5477, 0.7303]
+> ```
 
 ## ROPE 频率表计算
 
@@ -310,7 +303,7 @@ ROPE 所对应的函数部分先进行初始化，同时添加重置参数，动
 
 > - 在此说明为什么要对 emb 表进行复制，拼接 ：
 > 
->   由于 ROPE 的原理是每两个维度分为一组，因此在先前计算 freq 表时，实际上是在计算每两个维度分组后对应的角度，故得到的频率表需要复制后拼接才能对应原先的 hidden 层维度
+>   由于 ROPE 的原理是每两个维度分为一组，因此在先前计算 freq 表时，实际上是在计算每两个维度分组后对应的角度，故得到的频率表需要复制后拼接才能对应原先的 hidden_layer 维度
 > - 对于一个样本的某个 token 向量，频率表计算方法如下：
 >
 >   inv_freq_expanded -> [[1.0], [0.1], [0.01]]
@@ -322,7 +315,7 @@ ROPE 所对应的函数部分先进行初始化，同时添加重置参数，动
 >   -> [3.0, 0.3, 0.03, 3.0, 0.3, 0.03]
 > - 那么为什么不是 [3.0, 3.0, 0.3, 0.3, 0.03, 0.03] 呢？
 > 
->   事实上这两种写法的效果是完全等效的，但是 PyTorch 在实现矩阵旋转的时候，是通过逐元素相乘和重排的方法来实现的，这样做会更方便进行广播，这点我们在后面再进行详细解析
+>   事实上，ROPE 的分组旋转并不是按相邻维度进行的，对 Q 张量来说，是按 (Q1, Q4) , (Q2, Q5) , (Q3, Q6) 进行分割的，原因是 ROPE 将整个向量视为一个分前后两半的复数 (x1 + x2 i) 进行旋转，因此前半段第一个的维度对应后半段的第一个维度，具体原理在 rotate_half 中详细阐明
 
 ## ROPE 
 
@@ -344,17 +337,124 @@ def apply_rotary_pos_emb(q, k, cos, sin, position_ids=None, unsqueeze_dim=1):
 apply_rotary_pos_emb 将 cos 与 sin 进行升维广播，之后调用  rotate_half将 Q、K 的各维度成对进行旋转，最终返回添加位置信息后的 Q、K 向量
 
 > **generate example**
+> ```python
+> rotate_half :
+> x -> [1.0, 2.0, 3.0, 4.0]
+> -> [-3.0, -4.0, 1.0, 2.0]
+> 
+> apply_rotary_pos_emb :
+> Q -> [1.0, 2.0, 3.0, 4.0]
+> cos -> [0.5, 0.5, 0.5, 0.5]
+> sin -> [0.866, 0.866, 0.866, 0.866]
+> rotate_half(Q) -> [-3.0, -4.0, 1.0, 2.0]
+> Q * cos -> [0.5, 1.0, 1.5, 2.0]
+> rotate_half(Q) * sin -> [-2.598,-3.464,0.866,1.732]
+> Q_embed -> [-2.098, -2.464, 2.366, 3.732]
+> ```
+
+## MLP
 
 ```python
-rotate_half :
-x -> [1.0, 2.0, 3.0, 4.0]
--> [-3.0, -4.0, 1.0, 2.0]
-apply_rotary_pos_emb :
-Q -> [1.0, 2.0, 3.0, 4.0]
-cos -> [0.5, 0.5, 0.5, 0.5]
-sin -> [0.866, 0.866, 0.866, 0.866]
-rotate_half(Q) -> [-3.0, -4.0, 1.0, 2.0]
-Q * cos -> [0.5, 1.0, 1.5, 2.0]
-rotate_half(Q) * sin -> [-2.598,-3.464,0.866,1.732]
-Q_embed -> [-2.098, -2.464, 2.366, 3.732]
+class DreamMLP(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        self.hidden_size = config.hidden_size
+        self.intermediate_size = config.intermediate_size
+        self.gate_proj = nn.Linear(self.hidden_size, self.intermediate_size, bias=False)
+        self.up_proj = nn.Linear(self.hidden_size, self.intermediate_size, bias=False)
+        self.down_proj = nn.Linear(self.intermediate_size, self.hidden_size, bias=False)
+        self.act_fn = ACT2FN[config.hidden_act]
+
+    def forward(self, hidden_state):
+        return self.down_proj(self.act_fn(self.gate_proj(hidden_state)) * self.up_proj(hidden_state))
 ```
+本段函数是 MLP 的核心实现，包含 up_proj , down_proj , gate_proj 三个权重矩阵以及 SiLu 激活函数，对每个 token 来说，其向量先与 gate_proj 做矩阵乘法，使其拓展至更高维度，并通过 SiLu 函数进行激活，得到 gate 矩阵，然后再与 up_proj 做矩阵乘法，得到 up 矩阵，将 up 矩阵与 gate 矩阵做元素乘法，得到 h 矩阵，最后将所得 h 矩阵与 down_proj 做矩阵乘法，将维度压缩至原隐藏层维度，为 token 增加更多样的信息
+
+> 拓展后的维度大小名为 intermediate_size，在实际应用中，一般是 hidden_layer 的四倍，对 GPT3 来说，整个模型约三分之二的参数量都保存在 MLP 层的各种权重矩阵中，这些参数记录了模型学习到的各种知识
+
+> **generate example**
+> ```python
+> x -> 
+> [1.0,
+> -2.0]
+> W_gate -> 
+> [[1.0, -1.0],
+> [0.5, 0.5],
+> [-1.0, 2.0],
+> [2.0, 1.0]]
+> W_up -> 
+> [[0.1, 0.2],
+> [0.3, -0.1],
+> [-0.2, 0.5],
+> [1.0, -1.0]]
+> W_down -> 
+> [[0.2, -0.5, 0.3, 0.1],
+> [0.4, 0.1, -0.2, 0.5]]
+> g = W_gate @ x -> 
+> [3.0,
+> -0.5,
+> -5.0,
+> 0.0]
+> gate = SiLu(g) -> 
+> [2.8578,
+> -0.1888,
+> -0.0335,
+> 0.0]
+> up = W_up @ x -> 
+> [-0.3,
+> 0.5,
+> -1.2,
+> 3.0]
+> h = gate * up -> 
+> [-0.8573,
+> -0.0944,
+> 0.0402,
+> 0.0]
+> y = W_down @ h -> 
+> [-0.1122,
+> -0.3603]
+> ```
+
+## K、V 头扩展
+
+```python
+def repeat_kv(hidden_states: torch.Tensor, n_rep: int) -> torch.Tensor:
+    batch, num_key_value_heads, slen, head_dim = hidden_states.shape
+    if n_rep == 1:
+        return hidden_states
+    hidden_states = hidden_states[:, :, None, :, :].expand(batch, num_key_value_heads, n_rep, slen, head_dim)
+    return hidden_states.reshape(batch, num_key_value_heads * n_rep, slen, head_dim)
+```
+本段函数实现了对 K、V 头的扩展，使其与 Q 头数量相等，以符合传统 transformer 架构，具体操作是在 num_key_value_heads 后添加一个维度并复制 n_rep 次，进行 reshape 后得到最终的头数
+
+> 传统 transformer 中 K、Q、V 的头数是相同的，以便进行点积，用于计算注意力分数，但在 LLaMA 设计的 GQA 架构中，为了减少 KV_cache 带来的存储以及计算压力，其减少了 K、V 的头数，而 Dream 由于无法复用 KV_cache ，沿用了与 LLaMA 相同的设计，以缓解每次重新采样后计算 K、V 带来的算力压力
+
+> **generate example**
+> ```python
+> x -> 
+> [[1.0, 2.0],
+> [3.0, 4.0],
+> [5.0, 6.0]],  # 头0
+> 
+> [[7.0, 8.0],
+> [9.0, 10.0],
+> [11.0, 12.0]] # 头1
+> 
+> repeat_kv : 
+> 
+> [[1.0, 2.0],
+> [3.0, 4.0],
+> [5.0, 6.0]],  # 头0(copy_1)
+> 
+> [[1.0, 2.0],
+> [3.0, 4.0],
+> [5.0, 6.0]],  # 头0(copy_2)
+> 
+> [[7.0, 8.0],
+> [9.0, 10.0],
+> [11.0, 12.0]] # 头1(copy1)
+> 
+> [[7.0, 8.0],
+> [9.0, 10.0],
+> [11.0, 12.0]] # 头1(copy_2)
+> ```

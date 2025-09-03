@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="基于概率阈值保留候选 token top_p 1 2 3 4 5 6 7 8 9 10 11 12 def top_p_logits(logits, top_p=None): sorted_logits, sorted_indices = torch.sort(logits, descending=True) cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1) sorted_indices_to_remove = cumulative_probs &gt; top_p sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone() sorted_indices_to_remove[..., 0] = 0 mask = torch.zeros_like(logits, dtype=torch.bool, device=logits.device) mask = mask.scatter_(-1, sorted_indices, sorted_indices_to_remove) logits = logits.masked_fill(mask, torch.finfo(logits.dtype).min) return logits 本函数先将得到的 logits 进行递减排序并获取索引，然后计算累加和，超过 top_p 概率的 logits 将被标记为 True，同时通过将整个列表右移并在第一位填充 0 来强制保留概率最大的候选 token，创建一个全为 Flase 的 mask 列表，将上述修改后的索引映射回去，最后将 mask 列表中标记为 True 的位置的 logits 设置为极小值，使其不会被采样\ngenerate example\n1 2 3 4 5 6 7 8 9 10 11 12 候选 token -&gt; [A, B, C, D] logits -&gt; [2.0, 0.5, 1.0, -0.5] top_p -&gt; 0.8 sorted_logits -&gt; [2.0, 1.0, 0.5, -0.5] sorted_indices -&gt; [0, 1, 2, 3] softmax : probs -&gt; [0.57, 0.21, 0.14, 0.08] 累计和 -&gt; [0.57, 0.78, 0.92, 1.00] sorted_indices_to_remove -&gt; [False, False, True, True] -&gt; [False, False, False, True] mask -&gt; [False, False, False, True] logits -&gt; [2.0, 1.0, 0.5, -1e38] top_k 1 2 3 4 5 def top_k_logits(logits, top_k=None): top_k = min(top_k, logits.size(-1)) indices_to_remove = logits &lt; torch.topk(logits, top_k)[0][..., -1, None] logits = logits.masked_fill(indices_to_remove, torch.finfo(logits.dtype).min) return logits 本函数先进行安全性检查，防止 top_k 的大小大于词表大小，然后将前 k 大的 logits 设置为极小值防止其被采样\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="基于概率阈值保留候选 token top_p 1 2 3 4 5 6 7 8 9 10 11 12 def top_p_logits(logits, top_p=None): sorted_logits, sorted_indices = torch.sort(logits, descending=True) cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1) sorted_indices_to_remove = cumulative_probs &gt; top_p sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone() sorted_indices_to_remove[..., 0] = 0 mask = torch.zeros_like(logits, dtype=torch.bool, device=logits.device) mask = mask.scatter_(-1, sorted_indices, sorted_indices_to_remove) logits = logits.masked_fill(mask, torch.finfo(logits.dtype).min) return logits 本函数先将得到的 logits 进行递减排序并获取索引，然后计算累加和，超过 top_p 概率的 logits 将被标记为 True，同时通过将整个列表右移并在第一位填充 0 来强制保留概率最大的候选 token，创建一个全为 Flase 的 mask 列表，将上述修改后的索引映射回去，最后将 mask 列表中标记为 True 的位置的 logits 设置为极小值，使其不会被采样\ngenerate example\n1 2 3 4 5 6 7 8 9 10 候选 token -&gt; [A, B, C, D] logits -&gt; [2.0, 0.5, 1.0, -0.5] top_p -&gt; 0.8 softmax : probs -&gt; [0.57, 0.21, 0.14, 0.08] 累计和 -&gt; [0.57, 0.78, 0.92, 1.00] sorted_indices_to_remove -&gt; [False, False, True, True] -&gt; [False, False, False, True] mask -&gt; [False, False, False, True] logits -&gt; [2.0, 1.0, 0.5, -1e38] top_k 1 2 3 4 5 def top_k_logits(logits, top_k=None): top_k = min(top_k, logits.size(-1)) indices_to_remove = logits &lt; torch.topk(logits, top_k)[0][..., -1, None] logits = logits.masked_fill(indices_to_remove, torch.finfo(logits.dtype).min) return logits 本函数先进行安全性检查，防止 top_k 的大小大于词表大小，然后将前 k 大的 logits 设置为极小值防止其被采样\n">
 <title>Dream</title>
 
 <link rel='canonical' href='https://mircecilia.netlify.app/en/p/dream/'>
 
 <link rel="stylesheet" href="/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css"><meta property='og:title' content="Dream">
-<meta property='og:description' content="基于概率阈值保留候选 token top_p 1 2 3 4 5 6 7 8 9 10 11 12 def top_p_logits(logits, top_p=None): sorted_logits, sorted_indices = torch.sort(logits, descending=True) cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1) sorted_indices_to_remove = cumulative_probs &gt; top_p sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone() sorted_indices_to_remove[..., 0] = 0 mask = torch.zeros_like(logits, dtype=torch.bool, device=logits.device) mask = mask.scatter_(-1, sorted_indices, sorted_indices_to_remove) logits = logits.masked_fill(mask, torch.finfo(logits.dtype).min) return logits 本函数先将得到的 logits 进行递减排序并获取索引，然后计算累加和，超过 top_p 概率的 logits 将被标记为 True，同时通过将整个列表右移并在第一位填充 0 来强制保留概率最大的候选 token，创建一个全为 Flase 的 mask 列表，将上述修改后的索引映射回去，最后将 mask 列表中标记为 True 的位置的 logits 设置为极小值，使其不会被采样\ngenerate example\n1 2 3 4 5 6 7 8 9 10 11 12 候选 token -&gt; [A, B, C, D] logits -&gt; [2.0, 0.5, 1.0, -0.5] top_p -&gt; 0.8 sorted_logits -&gt; [2.0, 1.0, 0.5, -0.5] sorted_indices -&gt; [0, 1, 2, 3] softmax : probs -&gt; [0.57, 0.21, 0.14, 0.08] 累计和 -&gt; [0.57, 0.78, 0.92, 1.00] sorted_indices_to_remove -&gt; [False, False, True, True] -&gt; [False, False, False, True] mask -&gt; [False, False, False, True] logits -&gt; [2.0, 1.0, 0.5, -1e38] top_k 1 2 3 4 5 def top_k_logits(logits, top_k=None): top_k = min(top_k, logits.size(-1)) indices_to_remove = logits &lt; torch.topk(logits, top_k)[0][..., -1, None] logits = logits.masked_fill(indices_to_remove, torch.finfo(logits.dtype).min) return logits 本函数先进行安全性检查，防止 top_k 的大小大于词表大小，然后将前 k 大的 logits 设置为极小值防止其被采样\n">
+<meta property='og:description' content="基于概率阈值保留候选 token top_p 1 2 3 4 5 6 7 8 9 10 11 12 def top_p_logits(logits, top_p=None): sorted_logits, sorted_indices = torch.sort(logits, descending=True) cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1) sorted_indices_to_remove = cumulative_probs &gt; top_p sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone() sorted_indices_to_remove[..., 0] = 0 mask = torch.zeros_like(logits, dtype=torch.bool, device=logits.device) mask = mask.scatter_(-1, sorted_indices, sorted_indices_to_remove) logits = logits.masked_fill(mask, torch.finfo(logits.dtype).min) return logits 本函数先将得到的 logits 进行递减排序并获取索引，然后计算累加和，超过 top_p 概率的 logits 将被标记为 True，同时通过将整个列表右移并在第一位填充 0 来强制保留概率最大的候选 token，创建一个全为 Flase 的 mask 列表，将上述修改后的索引映射回去，最后将 mask 列表中标记为 True 的位置的 logits 设置为极小值，使其不会被采样\ngenerate example\n1 2 3 4 5 6 7 8 9 10 候选 token -&gt; [A, B, C, D] logits -&gt; [2.0, 0.5, 1.0, -0.5] top_p -&gt; 0.8 softmax : probs -&gt; [0.57, 0.21, 0.14, 0.08] 累计和 -&gt; [0.57, 0.78, 0.92, 1.00] sorted_indices_to_remove -&gt; [False, False, True, True] -&gt; [False, False, False, True] mask -&gt; [False, False, False, True] logits -&gt; [2.0, 1.0, 0.5, -1e38] top_k 1 2 3 4 5 def top_k_logits(logits, top_k=None): top_k = min(top_k, logits.size(-1)) indices_to_remove = logits &lt; torch.topk(logits, top_k)[0][..., -1, None] logits = logits.masked_fill(indices_to_remove, torch.finfo(logits.dtype).min) return logits 本函数先进行安全性检查，防止 top_k 的大小大于词表大小，然后将前 k 大的 logits 设置为极小值防止其被采样\n">
 <meta property='og:url' content='https://mircecilia.netlify.app/en/p/dream/'>
 <meta property='og:site_name' content='Cecilia'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-08-29T11:18:33&#43;08:00'/><meta property='article:modified_time' content='2025-08-29T11:18:33&#43;08:00'/>
 <meta name="twitter:title" content="Dream">
-<meta name="twitter:description" content="基于概率阈值保留候选 token top_p 1 2 3 4 5 6 7 8 9 10 11 12 def top_p_logits(logits, top_p=None): sorted_logits, sorted_indices = torch.sort(logits, descending=True) cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1) sorted_indices_to_remove = cumulative_probs &gt; top_p sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone() sorted_indices_to_remove[..., 0] = 0 mask = torch.zeros_like(logits, dtype=torch.bool, device=logits.device) mask = mask.scatter_(-1, sorted_indices, sorted_indices_to_remove) logits = logits.masked_fill(mask, torch.finfo(logits.dtype).min) return logits 本函数先将得到的 logits 进行递减排序并获取索引，然后计算累加和，超过 top_p 概率的 logits 将被标记为 True，同时通过将整个列表右移并在第一位填充 0 来强制保留概率最大的候选 token，创建一个全为 Flase 的 mask 列表，将上述修改后的索引映射回去，最后将 mask 列表中标记为 True 的位置的 logits 设置为极小值，使其不会被采样\ngenerate example\n1 2 3 4 5 6 7 8 9 10 11 12 候选 token -&gt; [A, B, C, D] logits -&gt; [2.0, 0.5, 1.0, -0.5] top_p -&gt; 0.8 sorted_logits -&gt; [2.0, 1.0, 0.5, -0.5] sorted_indices -&gt; [0, 1, 2, 3] softmax : probs -&gt; [0.57, 0.21, 0.14, 0.08] 累计和 -&gt; [0.57, 0.78, 0.92, 1.00] sorted_indices_to_remove -&gt; [False, False, True, True] -&gt; [False, False, False, True] mask -&gt; [False, False, False, True] logits -&gt; [2.0, 1.0, 0.5, -1e38] top_k 1 2 3 4 5 def top_k_logits(logits, top_k=None): top_k = min(top_k, logits.size(-1)) indices_to_remove = logits &lt; torch.topk(logits, top_k)[0][..., -1, None] logits = logits.masked_fill(indices_to_remove, torch.finfo(logits.dtype).min) return logits 本函数先进行安全性检查，防止 top_k 的大小大于词表大小，然后将前 k 大的 logits 设置为极小值防止其被采样\n">
+<meta name="twitter:description" content="基于概率阈值保留候选 token top_p 1 2 3 4 5 6 7 8 9 10 11 12 def top_p_logits(logits, top_p=None): sorted_logits, sorted_indices = torch.sort(logits, descending=True) cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1) sorted_indices_to_remove = cumulative_probs &gt; top_p sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone() sorted_indices_to_remove[..., 0] = 0 mask = torch.zeros_like(logits, dtype=torch.bool, device=logits.device) mask = mask.scatter_(-1, sorted_indices, sorted_indices_to_remove) logits = logits.masked_fill(mask, torch.finfo(logits.dtype).min) return logits 本函数先将得到的 logits 进行递减排序并获取索引，然后计算累加和，超过 top_p 概率的 logits 将被标记为 True，同时通过将整个列表右移并在第一位填充 0 来强制保留概率最大的候选 token，创建一个全为 Flase 的 mask 列表，将上述修改后的索引映射回去，最后将 mask 列表中标记为 True 的位置的 logits 设置为极小值，使其不会被采样\ngenerate example\n1 2 3 4 5 6 7 8 9 10 候选 token -&gt; [A, B, C, D] logits -&gt; [2.0, 0.5, 1.0, -0.5] top_p -&gt; 0.8 softmax : probs -&gt; [0.57, 0.21, 0.14, 0.08] 累计和 -&gt; [0.57, 0.78, 0.92, 1.00] sorted_indices_to_remove -&gt; [False, False, True, True] -&gt; [False, False, False, True] mask -&gt; [False, False, False, True] logits -&gt; [2.0, 1.0, 0.5, -1e38] top_k 1 2 3 4 5 def top_k_logits(logits, top_k=None): top_k = min(top_k, logits.size(-1)) indices_to_remove = logits &lt; torch.topk(logits, top_k)[0][..., -1, None] logits = logits.masked_fill(indices_to_remove, torch.finfo(logits.dtype).min) return logits 本函数先进行安全性检查，防止 top_k 的大小大于词表大小，然后将前 k 大的 logits 设置为极小值防止其被采样\n">
     </head>
     <body class="
     article-page
@@ -182,6 +182,8 @@
     <li><a href="#归一化-embedding-后的向量">归一化 embedding 后的向量</a></li>
     <li><a href="#rope-频率表计算">ROPE 频率表计算</a></li>
     <li><a href="#rope">ROPE</a></li>
+    <li><a href="#mlp">MLP</a></li>
+    <li><a href="#kv-头扩展">K、V 头扩展</a></li>
   </ol>
 </nav>
         </div>
@@ -285,7 +287,7 @@
 </div>
 </div><p>本函数先将得到的 logits 进行递减排序并获取索引，然后计算累加和，超过 top_p 概率的 logits 将被标记为 True，同时通过将整个列表右移并在第一位填充 0 来强制保留概率最大的候选 token，创建一个全为 Flase 的 mask 列表，将上述修改后的索引映射回去，最后将 mask 列表中标记为 True 的位置的 logits 设置为极小值，使其不会被采样</p>
 <blockquote>
-<p><strong>generate example</strong></p></blockquote>
+<p><strong>generate example</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -298,15 +300,11 @@
 </span><span class="lnt"> 8
 </span><span class="lnt"> 9
 </span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">候选</span> <span class="n">token</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">D</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl"><span class="n">logits</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl"><span class="n">top_p</span> <span class="o">-&gt;</span> <span class="mf">0.8</span>
-</span></span><span class="line"><span class="cl"><span class="n">sorted_logits</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="n">sorted_indices</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl"><span class="n">softmax</span> <span class="p">:</span>
 </span></span><span class="line"><span class="cl"><span class="n">probs</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">0.57</span><span class="p">,</span> <span class="mf">0.21</span><span class="p">,</span> <span class="mf">0.14</span><span class="p">,</span> <span class="mf">0.08</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl"><span class="n">累计和</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">0.57</span><span class="p">,</span> <span class="mf">0.78</span><span class="p">,</span> <span class="mf">0.92</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]</span>
@@ -316,7 +314,8 @@
 </span></span><span class="line"><span class="cl"><span class="n">logits</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1e38</span><span class="p">]</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h3 id="top_k">top_k
+</div></blockquote>
+<h3 id="top_k">top_k
 </h3><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -335,7 +334,7 @@
 </div>
 </div><p>本函数先进行安全性检查，防止 top_k 的大小大于词表大小，然后将前 k 大的 logits 设置为极小值防止其被采样</p>
 <blockquote>
-<p><strong>generate example</strong></p></blockquote>
+<p><strong>generate example</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -350,7 +349,8 @@
 </span></span><span class="line"><span class="cl"><span class="n">logits</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1e38</span><span class="p">,</span> <span class="o">-</span><span class="mf">1e38</span><span class="p">]</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="从候选-token-中采样">从候选 token 中采样
+</div></blockquote>
+<h2 id="从候选-token-中采样">从候选 token 中采样
 </h2><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -422,7 +422,7 @@
 </div><p>该函数根据温度大小控制 logits 分布的尖锐程度，然后应用 top_k / top_p 策略过滤可能性低的 token，之后使用 softmax 将 logits 归一化为概率分布，若温度大于零，则使用多项分布采样，按照各 logits 概率选出解码 token，否则直接选取概率最大的 token</p>
 <p>若使用 margin_confidence，则置信度定义为第一名概率减去第二名概率，若使用 neg_entropy，则置信度定义为负熵，即分布越尖锐置信度越高</p>
 <blockquote>
-<p><strong>generate example</strong></p></blockquote>
+<p><strong>generate example</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -440,7 +440,6 @@
 </span><span class="lnt">13
 </span><span class="lnt">14
 </span><span class="lnt">15
-</span><span class="lnt">16
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">采用</span> <span class="n">top_k</span> <span class="o">/</span> <span class="n">top_p</span> <span class="n">过滤后</span> <span class="p">:</span>
@@ -450,18 +449,18 @@
 </span></span><span class="line"><span class="cl"><span class="n">softmax</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">0.62</span><span class="p">,</span> <span class="mf">0.23</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl"><span class="n">选择</span> <span class="n">token</span> <span class="o">-&gt;</span> <span class="n">A</span>
 </span></span><span class="line"><span class="cl"><span class="n">confidence</span> <span class="o">-&gt;</span> <span class="mf">0.62</span> <span class="p">;</span> <span class="n">x0</span> <span class="o">-&gt;</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="n">temperture</span> <span class="o">-&gt;</span> <span class="mi">2</span> <span class="p">:</span>
+</span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="n">logits</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl"><span class="n">softmax</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">0.48</span><span class="p">,</span> <span class="mf">0.29</span><span class="p">,</span><span class="mf">0.23</span><span class="p">]</span> <span class="c1"># 分布更平缓</span>
 </span></span><span class="line"><span class="cl"><span class="n">选择</span> <span class="n">token</span> <span class="o">-&gt;</span> <span class="n">A</span> <span class="o">/</span> <span class="n">B</span> <span class="o">/</span> <span class="n">C</span> <span class="p">(</span><span class="n">按照概率随机抽样</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="n">confidence</span> <span class="p">:</span>
 </span></span><span class="line"><span class="cl"><span class="n">margin_confidence</span> <span class="o">-&gt;</span> <span class="mf">0.19</span> <span class="p">;</span> <span class="n">x0</span> <span class="o">-&gt;</span> <span class="mi">0</span> <span class="o">/</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span>
 </span></span><span class="line"><span class="cl"><span class="n">neg_entropy</span> <span class="o">-&gt;</span> <span class="o">-</span><span class="mf">1.05</span> <span class="p">;</span> <span class="n">x0</span> <span class="o">-&gt;</span> <span class="mi">1</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="离散扩散解码">离散扩散解码
+</div></blockquote>
+<h2 id="离散扩散解码">离散扩散解码
 </h2><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -545,7 +544,7 @@
 </div>
 </div><p>该段将输入序列的右侧全部使用 mask_token_id 填充，同时判断是否进行注意力遮蔽，若进行注意力遮蔽，则扩展传入的 attention_mask 至 max_length ，然后生成符合 transformer 架构的四维张量，使注意力机制只在非遮蔽 token 上进行，同时生成有效 token 位置相应的索引</p>
 <blockquote>
-<p><strong>generate example</strong></p></blockquote>
+<p><strong>generate example</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -582,7 +581,8 @@
 </span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><div class="highlight"><div class="chroma">
+</div></blockquote>
+<div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
 </span><span class="lnt"> 2
@@ -750,7 +750,7 @@
 </div>
 </div><p>本段函数先保存输入 dtype，然后将其转化为 float32 以保证数值稳定，随后对 embedding 后的向量求均方根，保证向量不改变方向而只改变长度，不损害基本语义</p>
 <blockquote>
-<p><strong>generate example</strong></p></blockquote>
+<p><strong>generate example</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -763,7 +763,8 @@
 </span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">0.1826</span><span class="p">,</span> <span class="mf">0.3651</span><span class="p">,</span> <span class="mf">0.5477</span><span class="p">,</span> <span class="mf">0.7303</span><span class="p">]</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="rope-频率表计算">ROPE 频率表计算
+</div></blockquote>
+<h2 id="rope-频率表计算">ROPE 频率表计算
 </h2><div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -813,7 +814,7 @@
 <ul>
 <li>
 <p>在此说明为什么要对 emb 表进行复制，拼接 ：</p>
-<p>由于 ROPE 的原理是每两个维度分为一组，因此在先前计算 freq 表时，实际上是在计算每两个维度分组后对应的角度，故得到的频率表需要复制后拼接才能对应原先的 hidden 层维度</p>
+<p>由于 ROPE 的原理是每两个维度分为一组，因此在先前计算 freq 表时，实际上是在计算每两个维度分组后对应的角度，故得到的频率表需要复制后拼接才能对应原先的 hidden_layer 维度</p>
 </li>
 <li>
 <p>对于一个样本的某个 token 向量，频率表计算方法如下：</p>
@@ -824,7 +825,7 @@
 </li>
 <li>
 <p>那么为什么不是 [3.0, 3.0, 0.3, 0.3, 0.03, 0.03] 呢？</p>
-<p>事实上这两种写法的效果是完全等效的，但是 PyTorch 在实现矩阵旋转的时候，是通过逐元素相乘和重排的方法来实现的，这样做会更方便进行广播，这点我们在后面再进行详细解析</p>
+<p>事实上，ROPE 的分组旋转并不是按相邻维度进行的，对 Q 张量来说，是按 (Q1, Q4) , (Q2, Q5) , (Q3, Q6) 进行分割的，原因是 ROPE 将整个向量视为一个分前后两半的复数 (x1 + x2 i) 进行旋转，因此前半段第一个的维度对应后半段的第一个维度，具体原理在 rotate_half 中详细阐明</p>
 </li>
 </ul></blockquote>
 <h2 id="rope">ROPE
@@ -859,7 +860,7 @@
 </div><p>本段函数是 ROPE 的核心实现，rotate_half 先将 embedding 后的向量 (hidden state) 拆成前后两半，对后半取反后拼接，将整个向量 (x1, x2) 视作复数 (x1 + x2 i) 进行九十度旋转</p>
 <p>apply_rotary_pos_emb 将 cos 与 sin 进行升维广播，之后调用  rotate_half将 Q、K 的各维度成对进行旋转，最终返回添加位置信息后的 Q、K 向量</p>
 <blockquote>
-<p><strong>generate example</strong></p></blockquote>
+<p><strong>generate example</strong></p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -873,11 +874,13 @@
 </span><span class="lnt"> 9
 </span><span class="lnt">10
 </span><span class="lnt">11
+</span><span class="lnt">12
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">rotate_half</span> <span class="p">:</span>
 </span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl"><span class="o">-&gt;</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="n">apply_rotary_pos_emb</span> <span class="p">:</span>
 </span></span><span class="line"><span class="cl"><span class="n">Q</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">]</span>
 </span></span><span class="line"><span class="cl"><span class="n">cos</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
@@ -888,7 +891,212 @@
 </span></span><span class="line"><span class="cl"><span class="n">Q_embed</span> <span class="o">-&gt;</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.098</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.464</span><span class="p">,</span> <span class="mf">2.366</span><span class="p">,</span> <span class="mf">3.732</span><span class="p">]</span>
 </span></span></code></pre></td></tr></table>
 </div>
+</div></blockquote>
+<h2 id="mlp">MLP
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">DreamMLP</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">hidden_size</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">intermediate_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">intermediate_size</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">gate_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intermediate_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">up_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">intermediate_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">down_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intermediate_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hidden_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="bp">self</span><span class="o">.</span><span class="n">act_fn</span> <span class="o">=</span> <span class="n">ACT2FN</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">hidden_act</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden_state</span><span class="p">):</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">down_proj</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">act_fn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gate_proj</span><span class="p">(</span><span class="n">hidden_state</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">up_proj</span><span class="p">(</span><span class="n">hidden_state</span><span class="p">))</span>
+</span></span></code></pre></td></tr></table>
 </div>
+</div><p>本段函数是 MLP 的核心实现，包含 up_proj , down_proj , gate_proj 三个权重矩阵以及 SiLu 激活函数，对每个 token 来说，其向量先与 gate_proj 做矩阵乘法，使其拓展至更高维度，并通过 SiLu 函数进行激活，得到 gate 矩阵，然后再与 up_proj 做矩阵乘法，得到 up 矩阵，将 up 矩阵与 gate 矩阵做元素乘法，得到 h 矩阵，最后将所得 h 矩阵与 down_proj 做矩阵乘法，将维度压缩至原隐藏层维度，为 token 增加更多样的信息</p>
+<blockquote>
+<p>拓展后的维度大小名为 intermediate_size，在实际应用中，一般是 hidden_layer 的四倍，对 GPT3 来说，整个模型约三分之二的参数量都保存在 MLP 层的各种权重矩阵中，这些参数记录了模型学习到的各种知识</p></blockquote>
+<blockquote>
+<p><strong>generate example</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span><span class="mf">2.0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">W_gate</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="n">W_up</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="n">W_down</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="mf">0.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]]</span>
+</span></span><span class="line"><span class="cl"><span class="n">g</span> <span class="o">=</span> <span class="n">W_gate</span> <span class="o">@</span> <span class="n">x</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="mf">0.0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">gate</span> <span class="o">=</span> <span class="n">SiLu</span><span class="p">(</span><span class="n">g</span><span class="p">)</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">2.8578</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span><span class="mf">0.1888</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span><span class="mf">0.0335</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="mf">0.0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">up</span> <span class="o">=</span> <span class="n">W_up</span> <span class="o">@</span> <span class="n">x</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="mf">0.5</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span><span class="mf">1.2</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="mf">3.0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">h</span> <span class="o">=</span> <span class="n">gate</span> <span class="o">*</span> <span class="n">up</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="o">-</span><span class="mf">0.8573</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span><span class="mf">0.0944</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="mf">0.0402</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="mf">0.0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="n">W_down</span> <span class="o">@</span> <span class="n">h</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="o">-</span><span class="mf">0.1122</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl"><span class="o">-</span><span class="mf">0.3603</span><span class="p">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></blockquote>
+<h2 id="kv-头扩展">K、V 头扩展
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="k">def</span> <span class="nf">repeat_kv</span><span class="p">(</span><span class="n">hidden_states</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">n_rep</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">batch</span><span class="p">,</span> <span class="n">num_key_value_heads</span><span class="p">,</span> <span class="n">slen</span><span class="p">,</span> <span class="n">head_dim</span> <span class="o">=</span> <span class="n">hidden_states</span><span class="o">.</span><span class="n">shape</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="n">n_rep</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">hidden_states</span>
+</span></span><span class="line"><span class="cl">    <span class="n">hidden_states</span> <span class="o">=</span> <span class="n">hidden_states</span><span class="p">[:,</span> <span class="p">:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">num_key_value_heads</span><span class="p">,</span> <span class="n">n_rep</span><span class="p">,</span> <span class="n">slen</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">hidden_states</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">num_key_value_heads</span> <span class="o">*</span> <span class="n">n_rep</span><span class="p">,</span> <span class="n">slen</span><span class="p">,</span> <span class="n">head_dim</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>本段函数实现了对 K、V 头的扩展，使其与 Q 头数量相等，以符合传统 transformer 架构，具体操作是在 num_key_value_heads 后添加一个维度并复制 n_rep 次，进行 reshape 后得到最终的头数</p>
+<blockquote>
+<p>传统 transformer 中 K、Q、V 的头数是相同的，以便进行点积，用于计算注意力分数，但在 LLaMA 设计的 GQA 架构中，为了减少 KV_cache 带来的存储以及计算压力，其减少了 K、V 的头数，而 Dream 由于无法复用 KV_cache ，沿用了与 LLaMA 相同的设计，以缓解每次重新采样后计算 K、V 带来的算力压力</p></blockquote>
+<blockquote>
+<p><strong>generate example</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">-&gt;</span> 
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">]],</span>  <span class="c1"># 头0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">11.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">]]</span> <span class="c1"># 头1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">repeat_kv</span> <span class="p">:</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">]],</span>  <span class="c1"># 头0(copy_1)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">]],</span>  <span class="c1"># 头0(copy_2)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">11.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">]]</span> <span class="c1"># 头1(copy1)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">[[</span><span class="mf">7.0</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">9.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">],</span>
+</span></span><span class="line"><span class="cl"><span class="p">[</span><span class="mf">11.0</span><span class="p">,</span> <span class="mf">12.0</span><span class="p">]]</span> <span class="c1"># 头1(copy_2)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></blockquote>
+
 </section>
 
 
