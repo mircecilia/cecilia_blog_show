@@ -248,7 +248,7 @@ if number_transfer_tokens > 0:
 ```
 该段函数通过 histories 保存并查看解码过程，返回最终的生成序列
 
-## 归一化 embedding 后的向量
+## RNSNorm
 
 ```python
 class DreamRMSNorm(nn.Module):
@@ -427,7 +427,7 @@ def repeat_kv(hidden_states: torch.Tensor, n_rep: int) -> torch.Tensor:
     hidden_states = hidden_states[:, :, None, :, :].expand(batch, num_key_value_heads, n_rep, slen, head_dim)
     return hidden_states.reshape(batch, num_key_value_heads * n_rep, slen, head_dim)
 ```
-本段函数实现了对 K、V 头的扩展，使其与 Q 头数量相等，以符合传统 transformer 架构，具体操作是在 num_key_value_heads 后添加一个维度并复制 n_rep 次，进行 reshape 后得到最终的头数
+本段函数实现了对 K、V 头的扩展，使其与 Q 头数量相等，以符合传统 transformer 架构，具体操作是在 num_key_value_heads 后添加一个维度并复制 n_rep 次，reshape 后得到最终的头数
 
 > 传统 transformer 中 K、Q、V 的头数是相同的，以便进行点积，用于计算注意力分数，但在 LLaMA 设计的 GQA 架构中，为了减少 KV_cache 带来的存储以及计算压力，其减少了 K、V 的头数，而 Dream 由于无法复用 KV_cache ，沿用了与 LLaMA 相同的设计，以缓解每次重新采样后计算 K、V 带来的算力压力
 
@@ -491,6 +491,7 @@ class DreamAttention(nn.Module):
                 f"hidden_size must be divisible by num_heads (got `hidden_size`: {self.hidden_size}"
                 f" and `num_heads`: {self.num_heads})."
             )
+        
         self.q_proj = nn.Linear(self.hidden_size, self.num_heads * self.head_dim, bias=True)
         self.k_proj = nn.Linear(self.hidden_size, self.num_key_value_heads * self.head_dim, bias=True)
         self.v_proj = nn.Linear(self.hidden_size, self.num_key_value_heads * self.head_dim, bias=True)
@@ -498,7 +499,7 @@ class DreamAttention(nn.Module):
 
         self.rotary_emb = DreamRotaryEmbedding(config=self.config)
 ```
-本段函数先对隐藏层维度，多头数量，需要复制的 K、V 数量，最大序列长度，ROPE 频率表，dropout 比例进行初始化，选择不使用因果掩码，让模型具有全局视角，之后创建 q_proj，k_proj，v_proj，o_proj 四个层，为后续进行注意力机制做准备
+本段函数先对隐藏层维度，多头数量，需要复制的 K、V 数量，最大序列长度，ROPE 频率表，dropout 比例进行初始化，默认不使用因果掩码，使模型具有全局视角，之后创建 q_proj，k_proj，v_proj，o_proj 四个层，为后续进行注意力机制做准备
 
 > - 事实上，经过多头注意力计算后，拼回的输出的维度与原隐藏层维度是相同的，那么为什么要再经过 o_proj 层一次呢？
 >   
@@ -541,14 +542,14 @@ def forward(
     query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
 
     if past_key_value is not None:
-        cache_kwargs = {"sin": sin, "cos": cos, "cache_position": cache_position}  # Specific to RoPE models
+        cache_kwargs = {"sin": sin, "cos": cos, "cache_position": cache_position}
         key_states, value_states = past_key_value.update(key_states, value_states, self.layer_idx, cache_kwargs)
 
     key_states = repeat_kv(key_states, self.num_key_value_groups)
     value_states = repeat_kv(value_states, self.num_key_value_groups)
 
     attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(self.head_dim)
-    if attention_mask is not None:  # no matter the length, we just slice it
+    if attention_mask is not None: 
         causal_mask = attention_mask[:, :, :, : key_states.shape[-2]]
         attn_weights = attn_weights + causal_mask
 
@@ -572,8 +573,317 @@ def forward(
 
     return attn_output, attn_weights, past_key_value
 ```
-本段函数是 DreamAttention 计算的核心实现，先将 token 向量经过三次变换，得到 K、Q、V 向量后将其拆成多头，之后 reshape 以便进行矩阵计算
+本段函数是 DreamAttention 计算的核心实现，先将 token 向量经过三次变换，得到 K、Q、V 向量后再将其拆成多头，之后 reshape 以便进行矩阵计算
 
 应用 ROPE 为 Q、K 向量添加位置信息，若启用 KV_cache，则将新 token 的 K、V 追加至之前的 K、V 后，若使用 MQA，则复制扩展 K、V 头数，使 Q、K、V 头数相等，之后计算注意力分数，同时选择是否添加掩码，并保证形状对齐至 k_len 
 
 得到注意力分数后，使用 softmax 将其转为概率分布，同时使用 dropout 防止过拟合，在通过注意力权重加权求和 Value 后，校验形状是否正确，并将多头重新拼接，经过 o_proj 层后，返回加权计算所得的 V 
+
+## SDPA
+
+```python
+class DreamSdpaAttention(DreamAttention):
+    def forward(
+        self,
+        hidden_states: torch.Tensor,
+        attention_mask: Optional[torch.Tensor] = None,
+        position_ids: Optional[torch.LongTensor] = None,
+        past_key_value: Optional[Cache] = None,
+        output_attentions: bool = False,
+        use_cache: bool = False,
+        cache_position: Optional[torch.LongTensor] = None,
+        position_embeddings: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,  
+    ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
+        if output_attentions:
+            logger.warning_once(
+                "DreamModel is using DreamSdpaAttention, but `torch.nn.functional.scaled_dot_product_attention` does not support `output_attentions=True`. Falling back to the manual attention implementation, "
+                'but specifying the manual implementation will be required from Transformers version v5.0.0 onwards. This warning can be removed using the argument `attn_implementation="eager"` when loading the model.'
+            )
+            return super().forward(
+                hidden_states=hidden_states,
+                attention_mask=attention_mask,
+                position_ids=position_ids,
+                past_key_value=past_key_value,
+                output_attentions=output_attentions,
+                use_cache=use_cache,
+            )
+
+        bsz, q_len, _ = hidden_states.size()
+
+        query_states = self.q_proj(hidden_states)
+        key_states = self.k_proj(hidden_states)
+        value_states = self.v_proj(hidden_states)
+
+        query_states = query_states.view(bsz, q_len, self.num_heads, self.head_dim).transpose(1, 2)
+        key_states = key_states.view(bsz, q_len, self.num_key_value_heads, self.head_dim).transpose(1, 2)
+        value_states = value_states.view(bsz, q_len, self.num_key_value_heads, self.head_dim).transpose(1, 2)
+
+        if position_embeddings is None:
+            logger.warning_once(
+                "The attention layers in this model are transitioning from computing the RoPE embeddings internally "
+                "through `position_ids` (2D tensor with the indexes of the tokens), to using externally computed "
+                "`position_embeddings` (Tuple of tensors, containing cos and sin). In v4.46 `position_ids` will be "
+                "removed and `position_embeddings` will be mandatory."
+            )
+            cos, sin = self.rotary_emb(value_states, position_ids)
+        else:
+            cos, sin = position_embeddings
+        query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
+
+        if past_key_value is not None:
+            cache_kwargs = {"sin": sin, "cos": cos, "cache_position": cache_position}  
+            key_states, value_states = past_key_value.update(key_states, value_states, self.layer_idx, cache_kwargs)
+
+        key_states = repeat_kv(key_states, self.num_key_value_groups)
+        value_states = repeat_kv(value_states, self.num_key_value_groups)
+
+        if query_states.device.type == "cuda" and attention_mask is not None:
+            query_states = query_states.contiguous()
+            key_states = key_states.contiguous()
+            value_states = value_states.contiguous()
+
+        attn_output = torch.nn.functional.scaled_dot_product_attention(
+            query_states,
+            key_states,
+            value_states,
+            attn_mask=attention_mask if isinstance(attention_mask, torch.Tensor) else None,
+            dropout_p=self.attention_dropout if self.training else 0.0,
+            is_causal=False, 
+        )
+
+        attn_output = attn_output.transpose(1, 2).contiguous()
+        attn_output = attn_output.view(bsz, q_len, self.hidden_size)
+
+        attn_output = self.o_proj(attn_output)
+
+        return attn_output, None, past_key_value
+```
+本段函数是 DreamAttention 的优化版本，唯一的改动在于使用了 PyTorch 提供的 scaled_dot_product_attention 代替手写 softmax 注意力，该做法虽然不能返回注意力权重矩阵，但是会使性能提高
+
+> scaled_dot_product_attention 内部会调用 FlashAttention，通过切块技术将计算分解为小块，在 GPU 的 SRAM 上完成大部分计算
+
+## DecoderLayer
+
+```python
+class DreamDecoderLayer(nn.Module):
+    def __init__(self, config: DreamConfig, layer_idx: int):
+        super().__init__()
+        self.hidden_size = config.hidden_size
+
+        if config.sliding_window and config._attn_implementation != "flash_attention_2":
+            logger.warning_once(
+                f"Sliding Window Attention is enabled but not implemented for `{config._attn_implementation}`; "
+                "unexpected results may be encountered."
+            )
+        
+        self.self_attn = DreamSdpaAttention(config, layer_idx)
+
+        self.mlp = DreamMLP(config)
+        self.input_layernorm = DreamRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
+        self.post_attention_layernorm = DreamRMSNorm(config.hidden_size, eps=config.rms_norm_eps)
+```
+本段函数先初始化参数，定义 MLP 层与两个 RMSNorm 层，为后续进行解码做准备
+
+```python
+def forward(
+    self,
+    hidden_states: torch.Tensor,
+    attention_mask: Optional[torch.Tensor] = None,
+    position_ids: Optional[torch.LongTensor] = None,
+    past_key_value: Optional[Tuple[torch.Tensor]] = None,
+    output_attentions: Optional[bool] = False,
+    use_cache: Optional[bool] = False,
+    cache_position: Optional[torch.LongTensor] = None,
+    position_embeddings: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,  
+    **kwargs,
+) -> Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor]]]:
+
+    residual = hidden_states
+
+    hidden_states = self.input_layernorm(hidden_states)
+
+    hidden_states, self_attn_weights, present_key_value = self.self_attn(
+        hidden_states=hidden_states,
+        attention_mask=attention_mask,
+        position_ids=position_ids,
+        past_key_value=past_key_value,
+        output_attentions=output_attentions,
+        use_cache=use_cache,
+        cache_position=cache_position,
+        position_embeddings=position_embeddings,
+    )
+    hidden_states = residual + hidden_states
+
+    residual = hidden_states
+    hidden_states = self.post_attention_layernorm(hidden_states)
+    hidden_states = self.mlp(hidden_states)
+    hidden_states = residual + hidden_states
+
+    outputs = (hidden_states,)
+
+    if output_attentions:
+        outputs += (self_attn_weights,)
+
+    if use_cache:
+        outputs += (present_key_value,)
+
+       return outputs
+```
+本段函数是 decoder 的核心实现，先对 hidden_states 做一次 RMSNorm，确保梯度稳定，再调用 DreamSdpaAttention 实现注意力机制，之后进行残差连接，将得到的输出送入 MLP 层中
+
+在 MLP 层中，先对 hidden_states 进行一次 Norm，再调用 DreamMLP 进行计算，最后进行残差连接，输出 hidden_states 
+
+> **flow chart**
+> 
+> |
+> 
+> |--------- Norm ---------> Attention ---------> + residual ---------> x_attention
+>
+> |
+>
+> |--------- Norm ---------> MLP ---------> + residual --------> Output
+
+## Transformer 实现细节
+
+```python
+class DreamBaseModel(DreamPreTrainedModel):
+    def forward(
+        self,
+        input_ids: torch.LongTensor = None,
+        attention_mask: Optional[torch.Tensor] = None,
+        position_ids: Optional[torch.LongTensor] = None,
+        past_key_values: Optional[List[torch.FloatTensor]] = None,
+        inputs_embeds: Optional[torch.FloatTensor] = None,
+        use_cache: Optional[bool] = None,
+        output_attentions: Optional[bool] = None,
+        output_hidden_states: Optional[bool] = None,
+        return_dict: Optional[bool] = None,
+        cache_position: Optional[torch.LongTensor] = None,
+    ) -> Union[Tuple, BaseModelOutput]:
+        output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+        output_hidden_states = (
+            output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+        )
+
+        hidden_states = inputs_embeds
+
+        position_embeddings = self.rotary_emb(hidden_states, position_ids)
+
+        all_hidden_states = () if output_hidden_states else None
+        all_self_attns = () if output_attentions else None
+
+        for decoder_layer in self.layers:
+            if output_hidden_states:
+                all_hidden_states += (hidden_states,)
+
+            if self.gradient_checkpointing and self.training:
+                layer_outputs = self._gradient_checkpointing_func(
+                    decoder_layer.__call__,
+                    hidden_states,
+                    attention_mask,
+                    position_ids,
+                    past_key_values,
+                    output_attentions,
+                    use_cache,
+                    cache_position,
+                    position_embeddings,
+                )
+            else:
+                layer_outputs = decoder_layer(
+                    hidden_states,
+                    attention_mask=attention_mask,
+                    position_ids=position_ids,
+                    past_key_value=past_key_values,
+                    output_attentions=output_attentions,
+                    use_cache=use_cache,
+                    cache_position=cache_position,
+                    position_embeddings=position_embeddings,
+                )
+
+            hidden_states = layer_outputs[0]
+
+            if output_attentions:
+                all_self_attns += (layer_outputs[1],)
+
+        hidden_states = self.norm(hidden_states)
+
+        return BaseModelOutput(
+            last_hidden_state=hidden_states,
+            hidden_states=all_hidden_states,
+            attentions=all_self_attns,
+        )
+```
+该类是整个 transformer 骨干的核心实现，在此我们只摘录部分实现细节，forward 方法先将 ROPE 提前计算好，然后不断堆叠注意力计算层与 MLP 层，将每次得到的 hidden_states 进行保存后，再传给下一层 decoder_layer，实现多层叠加，最终得到输出 hidden_states 
+
+## lm_head 
+
+```python
+class DreamModel(DreamGenerationMixin, DreamPreTrainedModel):
+    _tied_weights_keys = ["lm_head.weight"]
+    def forward(
+        self,
+        input_ids: torch.LongTensor = None,
+        attention_mask: Optional[torch.Tensor] = None,
+        position_ids: Optional[torch.LongTensor] = None,
+        past_key_values: Optional[List[torch.FloatTensor]] = None,
+        inputs_embeds: Optional[torch.FloatTensor] = None,
+        labels: Optional[torch.LongTensor] = None,
+        use_cache: Optional[bool] = None,
+        output_attentions: Optional[bool] = None,
+        output_hidden_states: Optional[bool] = None,
+        return_dict: Optional[bool] = None,
+        cache_position: Optional[torch.LongTensor] = None,
+        num_logits_to_keep: int = 0,
+        **loss_kwargs,
+    ) -> Union[Tuple, MaskedLMOutput]:
+        output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
+        output_hidden_states = (
+            output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
+        )
+        return_dict = return_dict if return_dict is not None else self.config.use_return_dict
+
+        outputs = self.model(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            position_ids=position_ids,
+            past_key_values=past_key_values,
+            inputs_embeds=inputs_embeds,
+            use_cache=use_cache,
+            output_attentions=output_attentions,
+            output_hidden_states=output_hidden_states,
+            return_dict=return_dict,
+            cache_position=cache_position,
+        )
+
+        hidden_states = outputs[0]
+
+        logits = self.lm_head(hidden_states[:, -num_logits_to_keep:, :])
+
+        loss = None
+        if labels is not None:
+            loss = self.loss_function(logits, labels, self.vocab_size, **loss_kwargs)
+
+        if not return_dict:
+            output = (logits,) + outputs[1:]
+            return (loss,) + output if loss is not None else output
+
+        return MaskedLMOutput(
+            loss=loss,
+            logits=logits,
+            hidden_states=outputs.hidden_states,
+            attentions=outputs.attentions,
+        )
+```
+该类的作用是计算最终词表的 logits ，在取出最终的 hidden_states 后，将其与词表的权重矩阵相乘，得到预测下一个词的 logits，同时计算交叉熵损失，最终将 loss，logits，hidden_states，注意力权重矩阵一并返回
+
+> **generate example**
+> ```python
+> hidden_states -> [0.2, -0.1, 0.4]
+> lm_head.wight.data -> 
+> [0.1, 0.2, 0.3],   # vocab[0]
+> [-0.1, 0.0, 0.2],  # vocab[1]
+> [0.4, -0.3, 0.1],  # vocab[2]
+> [0.2, 0.5, -0.4],  # vocab[3]
+> [-0.3, 0.2, 0.2],  # vocab[4]
+> logits -> [0.12, 0.06, 0.06, -0.06, 0.12]
+> ```
